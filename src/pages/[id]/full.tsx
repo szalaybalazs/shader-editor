@@ -1,8 +1,8 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { FC } from 'react';
 import styled from 'styled-components';
 import Canvas from '../../components/Canvas';
-import { shaders } from '../../core/shaders';
+import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iFullProps {
   shader: string;
@@ -20,18 +20,12 @@ const Full: FC<iFullProps> = ({ shader }) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: shaders.map(({ id }) => ({ params: { id } })),
-    fallback: false,
-  };
-};
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const shader = await getShaderBySlug(String(params.id));
+  if (!shader) return { notFound: true, props: {} };
 
-export const getStaticProps: GetStaticProps = async (params) => {
-  const shader = shaders.find((s) => s.id === params.params.id);
-  if (!shader) return { notFound: true };
   return {
-    props: shader,
+    props: JSON.parse(JSON.stringify(shader)),
   };
 };
 
