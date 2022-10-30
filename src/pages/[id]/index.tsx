@@ -1,8 +1,9 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import Canvas from '../../components/Canvas';
-import { shaders } from '../../core/shaders';
+import Editor from '../../components/Editor';
+import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iEditorProps {
   shader: string;
@@ -12,6 +13,7 @@ const Wrapper = styled.div`
   display: flex;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 `;
 
 const Segment = styled.div`
@@ -20,22 +22,12 @@ const Segment = styled.div`
   display: flex;
 `;
 
-const CodeEditor = styled.textarea`
-  width: 100%;
-  background-color: transparent;
-  color: var(--colour-font);
-  border: none;
-  outline: none;
-  padding: 24px;
-  resize: none;
-`;
-
-const Editor: FC<iEditorProps> = ({ shader: initialShader }) => {
+const EditorPage: FC<iEditorProps> = ({ shader: initialShader }) => {
   const [shader, setShader] = useState(initialShader);
   return (
     <Wrapper>
       <Segment>
-        <CodeEditor value={shader} onChange={({ target: { value } }) => setShader(value)} />
+        <Editor value={shader} onChange={setShader} />
       </Segment>
       <Segment>
         <Canvas shader={shader} />
@@ -43,19 +35,14 @@ const Editor: FC<iEditorProps> = ({ shader: initialShader }) => {
     </Wrapper>
   );
 };
-export const getStaticPaths: GetStaticPaths = async () => {
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const shader = await getShaderBySlug(String(params.id));
+  if (!shader) return { notFound: true, props: {} };
+
   return {
-    paths: shaders.map(({ id }) => ({ params: { id } })),
-    fallback: false,
+    props: JSON.parse(JSON.stringify(shader)),
   };
 };
 
-export const getStaticProps: GetStaticProps = async (params) => {
-  const shader = shaders.find((s) => s.id === params.params.id);
-  if (!shader) return { notFound: true };
-  return {
-    props: shader,
-  };
-};
-
-export default Editor;
+export default EditorPage;
