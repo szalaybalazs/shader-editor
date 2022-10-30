@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { Scene } from '../../core/scene';
 
 export const useDimensions = () => {
   const wrapper = useRef<HTMLDivElement>(null);

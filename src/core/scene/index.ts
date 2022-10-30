@@ -59,6 +59,7 @@ export class Scene {
     const now = Date.now();
     if (now - this.lastFpsInvocation < 500) return;
     this.lastFpsInvocation = now;
+
     this.onFpsChange(1000 / delta);
   };
 

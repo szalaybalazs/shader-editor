@@ -42,5 +42,5 @@ export const useWebGL = (shader: string) => {
     updateShader(shader);
   }, [shader]);
 
-  return { canvas, fps, isUpdating, error };
+  return { canvas, fps, isUpdating, error, scene };
 };

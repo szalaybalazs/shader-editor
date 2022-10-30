@@ -76,8 +76,8 @@ const Svg = styled.svg`
 `;
 
 const Canvas: FC<iCanvasProps> = ({ shader }) => {
-  const { canvas, fps, isUpdating, error } = useWebGL(shader);
-  const { wrapper, dimensions, visible } = useDimensions();
+  const { canvas, fps, error } = useWebGL(shader);
+  const { wrapper } = useDimensions();
 
   return (
     <Wrapper ref={wrapper} className='canvas-wrapper'>
