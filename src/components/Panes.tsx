@@ -1,5 +1,7 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { panesAtom } from '../atoms/view';
 
 const Wrapper = styled.div`
   display: flex;
@@ -43,8 +45,13 @@ interface iPanesProps {
 }
 
 const Panes: FC<iPanesProps> = ({ left, right }) => {
-  const [width, setWidth] = useState(0.5);
+  const [width, setWidth] = useRecoilState(panesAtom);
   const wrapper = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const panes = localStorage.getItem('panes');
+    if (panes) setWidth(Number(panes));
+  }, []);
 
   const _handleMouseMove = useCallback(
     (e) => {

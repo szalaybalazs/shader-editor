@@ -1,12 +1,13 @@
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { ChangeEvent, FC, useCallback, useEffect } from 'react';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import FullIcon from './icons/Full';
-import Overlay from './icons/Overlay';
-import SplitPaneIcon from './icons/SplitPane';
+import { viewAtom } from '../atoms/view';
+import { eViewOption } from '../types/view';
+import ViewSelector from './ViewSelector';
 
 const Logo = styled.div`
   height: 42px;
@@ -81,88 +82,15 @@ interface iHeaderProps {
   onNameChange: (name: string) => void;
 }
 
-const ViewSelectorWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  border-radius: 6px;
-  padding: 4px;
-  gap: 2px;
-  background-color: var(--background-secondary);
-`;
-
-const ViewOption = styled.button<{ active: boolean }>`
-  height: 36px;
-  width: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  border-radius: 4px;
-  background-color: transparent;
-  color: ${(p) => (p.active ? 'var(--colour-primary)' : 'var(--colour-font)')};
-  opacity: ${(p) => (p.active ? 1 : 0.8)};
-  z-index: 2;
-  transition: 160ms;
-  cursor: pointer;
-  svg {
-    height: 16px;
-  }
-  &:hover {
-  }
-`;
-
-const Background = styled.div<{ offsetLeft: number }>`
-  height: 36px;
-  width: 36px;
-  transform: translateX(${(p) => p.offsetLeft}px);
-  background-color: var(--border-colour);
-  position: absolute;
-  border-radius: 4px;
-  transition: 160ms ease-in-out;
-`;
-
-type eViewOption = 'SPLIT' | 'OVERLAY' | 'FULL';
-
-const offsets = {
-  SPLIT: 0,
-  OVERLAY: 36 + 2,
-  FULL: 72 + 4,
-};
-
-interface iViewSelectorProps {
-  active: eViewOption;
-  onViewChange: (view: eViewOption) => void;
-}
-
-const ViewSelector: FC<iViewSelectorProps> = ({ active, onViewChange }) => {
-  const [activeOption, setActiveOption] = useState(active);
-
-  const _handleHighlight = (view: eViewOption) => () => setActiveOption(view);
-  const _handleSelect = (view: eViewOption) => () => onViewChange(view);
-  const _handleMouseLeave = () => setActiveOption(active);
-  return (
-    <ViewSelectorWrapper onMouseLeave={_handleMouseLeave}>
-      <ViewOption active={'SPLIT' === active} onMouseEnter={_handleHighlight('SPLIT')} onClick={_handleSelect('SPLIT')}>
-        <SplitPaneIcon />
-      </ViewOption>
-      <ViewOption
-        active={'OVERLAY' === active}
-        onMouseEnter={_handleHighlight('OVERLAY')}
-        onClick={_handleSelect('OVERLAY')}
-      >
-        <Overlay />
-      </ViewOption>
-      <ViewOption active={'FULL' === active} onMouseEnter={_handleHighlight('FULL')} onClick={_handleSelect('FULL')}>
-        <FullIcon />
-      </ViewOption>
-      <Background offsetLeft={offsets[activeOption]} />
-    </ViewSelectorWrapper>
-  );
-};
-
 const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [view, setView] = useRecoilState(viewAtom);
+
+  useEffect(() => {
+    const view = localStorage.getItem('view');
+    if (view) setView(view as eViewOption);
+  }, []);
 
   const _handleChange = useCallback(
     ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
@@ -175,7 +103,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
     const { id } = router.query;
     console.log(router);
     if (view === 'FULL') return router.push(`/${id}/full`);
-    // router.push(`/${}`)
+    else setView(view);
   };
 
   const _handleLogin = useCallback(() => signIn(), []);
@@ -187,7 +115,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
       </Link>
       <Name value={name} onChange={_handleChange} />
       <Spacer />
-      <ViewSelector active='SPLIT' onViewChange={_handleViewChange} />
+      <ViewSelector active={view} onViewChange={_handleViewChange} />
       {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
     </Wrapper>
   );
