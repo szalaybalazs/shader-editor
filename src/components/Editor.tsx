@@ -1,8 +1,11 @@
+import * as glslparser from 'prettier-plugin-glsl';
+import { format } from 'prettier';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import theme from 'prism-react-renderer/themes/nightOwl';
-import { FC, Fragment, useId } from 'react';
+import { FC, Fragment, useEffect, useId } from 'react';
 import CodeEditor from 'react-simple-code-editor';
 import styled from 'styled-components';
+import toast from 'react-hot-toast';
 
 const Wrapper = styled.div`
   height: 100%;
@@ -16,7 +19,7 @@ interface iEditorProps {
   onChange: (value: string) => void;
 }
 const highlight = (code: string) => (
-  <Highlight {...defaultProps} theme={theme} code={code} language='clike'>
+  <Highlight {...defaultProps} theme={theme} code={code} language='c'>
     {({ tokens, getLineProps, getTokenProps }) => (
       <Fragment>
         {tokens.map((line, i) => (
@@ -33,6 +36,18 @@ const highlight = (code: string) => (
 
 const Editor: FC<iEditorProps> = ({ value, onChange }) => {
   const id = useId();
+  useEffect(() => {
+    const _handleKeyDown = (e) => {
+      const { key, metaKey } = e;
+      if (metaKey && key === 'i') {
+        onChange(format(value, { parser: 'glsl-parser', plugins: [glslparser], printWidth: 120 }));
+        toast.success('Code successfully formatted');
+      }
+    };
+
+    window.addEventListener('keydown', _handleKeyDown);
+    return () => window.removeEventListener('keydown', _handleKeyDown);
+  }, []);
   return (
     <Wrapper>
       <CodeEditor
