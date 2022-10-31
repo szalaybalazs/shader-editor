@@ -1,29 +1,15 @@
 import { GetServerSideProps } from 'next';
 import { FC, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import Canvas from '../../components/Canvas';
 import Editor from '../../components/Editor';
 import Panes from '../../components/Panes';
-import { iShader } from '../../core/shaders';
+import { iShader } from '../../database/models/Shader';
+
 import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iEditorProps extends iShader {}
 
-const Wrapper = styled.div`
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-`;
-
-const Segment = styled.div`
-  height: 100vh;
-  flex: 1;
-  display: flex;
-  overflow: auto;
-`;
-
-const EditorPage: FC<iEditorProps> = ({ shader: code, id }) => {
+const EditorPage: FC<iEditorProps> = ({ code, id }) => {
   const [shader, setShader] = useState(code);
 
   const _handleUpdate = (id: string, shader: string) => {
@@ -31,11 +17,7 @@ const EditorPage: FC<iEditorProps> = ({ shader: code, id }) => {
       method: 'POST',
       body: JSON.stringify({ id, shader }),
       headers: { 'Content-Type': 'application/json' },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-      });
+    });
   };
 
   useEffect(() => {

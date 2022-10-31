@@ -19,7 +19,7 @@ void main()
 export interface iShader extends Document {
   slug: string;
   name: string;
-  shader: string;
+  code: string;
   createdAt: string;
   updatedAt: string;
   userId: string;
@@ -32,7 +32,11 @@ const schema: Schema = new mongoose.Schema(
     name: {
       type: String,
     },
-    shader: {
+    // shader: {
+    //   type: String,
+    //   default: defaultCode,
+    // },
+    code: {
       type: String,
       default: defaultCode,
     },

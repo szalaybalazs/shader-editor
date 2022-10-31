@@ -8,7 +8,7 @@ export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise),
   callbacks: {
     async session({ session, user }) {
-      console.log(user), (session.user.id = user.id);
+      session.user.id = user.id;
       return Promise.resolve(session);
     },
   },

@@ -9,7 +9,7 @@ import { Schema } from 'mongoose';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await unstable_getServerSession(req, res, authOptions);
-  console.log(req.method);
+
   if (req.method === 'PUT') {
     const userId = session.user?.id;
 
@@ -24,13 +24,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       await dbConnect();
       const shader = await Shader.findOne({ _id: id });
-      console.log(shader);
       if (!shader) return res.status(404).json({ success: false });
       if (shader.userId && !(shader.userId as any).equals(session?.user?.id)) {
         return res.status(401).json({ success: false });
       }
 
-      shader.shader = code;
+      shader.code = code;
 
       await shader.save();
 
