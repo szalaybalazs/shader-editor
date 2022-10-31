@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
-  overflow-y: scroll;
+  overflow: scroll;
 `;
 
 interface iEditorProps {
@@ -45,6 +45,8 @@ const Editor: FC<iEditorProps> = ({ value, onChange }) => {
           fontFamily: '"Fira code", "Fira Mono", monospace',
           fontSize: 12,
           height: 'fit-content',
+          width: 'fit-content',
+          whiteSpace: 'nowrap',
         }}
       />
     </Wrapper>

@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Canvas from '../../components/Canvas';
 import Editor from '../../components/Editor';
+import Panes from '../../components/Panes';
 import { iShader } from '../../core/shaders';
 import { getShaderBySlug } from '../../database/shader.controller';
 
@@ -41,16 +42,7 @@ const EditorPage: FC<iEditorProps> = ({ shader: code, id }) => {
     const timeout = setTimeout(() => _handleUpdate(id, shader), 500);
     return () => clearTimeout(timeout);
   }, [shader]);
-  return (
-    <Wrapper>
-      <Segment>
-        <Editor value={shader} onChange={setShader} />
-      </Segment>
-      <Segment>
-        <Canvas shader={shader} />
-      </Segment>
-    </Wrapper>
-  );
+  return <Panes left={<Editor value={shader} onChange={setShader} />} right={<Canvas shader={shader} />} />;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {

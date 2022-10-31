@@ -89,3 +89,11 @@ html {
 * {
   outline: none;
 }
+
+body.resizing-horizontal {
+  &,
+  * {
+    user-select: none;
+    cursor: ew-resize !important;
+  }
+}
