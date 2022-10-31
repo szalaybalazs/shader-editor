@@ -1,8 +1,7 @@
 import { FC } from 'react';
-import Header from '../Header';
-import DocumentHead from './Head';
 import styled from 'styled-components';
 import Footer from '../Footer';
+import DocumentHead from './Head';
 
 interface iLayoutProps {
   title?: string;
@@ -24,7 +23,6 @@ const Layout: FC<iLayoutProps> = ({ title, children }) => {
   return (
     <Wrapper>
       <DocumentHead title={title} />
-      <Header />
       <Main>{children}</Main>
       <Footer />
     </Wrapper>
