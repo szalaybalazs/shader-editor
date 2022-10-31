@@ -8,9 +8,10 @@ import SplitPaneIcon from './icons/SplitPane';
 const ViewSelectorWrapper = styled.div`
   display: flex;
   align-items: center;
-  border-radius: 8px;
-  padding: 4px;
+  border-radius: 6px;
+  padding: 3px;
   gap: 2px;
+
   background-color: var(--background-secondary);
 `;
 
@@ -41,7 +42,7 @@ const Background = styled.div<{ offsetLeft: number }>`
   transform: translateX(${(p) => p.offsetLeft}px);
   background-color: var(--border-colour);
   position: absolute;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: 160ms ease-in-out;
 `;
 

@@ -14,14 +14,15 @@ const Logo = styled.div`
   width: 42px;
   background-color: var(--colour-primary);
   border-radius: 6px;
-  border: 1px solid var(--background-secondary);
 `;
 
-const Login = styled.button`
-  background-color: var(--colour-primary);
+const Button = styled.button`
+  background-color: var(--background-secondary);
   border-radius: 6px;
-  border: 1px solid var(--background-secondary);
-  padding: 12px 24px;
+  border: none;
+  padding: 0 32px;
+  height: 42px;
+  line-height: 42px;
   font-family: var(--font-main);
   font-weight: 500;
   cursor: pointer;
@@ -34,12 +35,23 @@ const Login = styled.button`
     filter: brightness(0.8);
   }
   &:focus {
+    box-shadow: 0 0 0 4px var(--border-colour);
+  }
+`;
+
+const ButtonPrimary = styled(Button)`
+  background-color: var(--colour-primary);
+  &:focus {
     box-shadow: 0 0 0 4px var(--colour-primary-translucent);
   }
 `;
 
+const Login = styled(Button)``;
+
 const Spacer = styled.div`
   flex: 1;
+  display: flex;
+  gap: 12px;
 `;
 
 const Avatar = styled.img`
@@ -47,6 +59,7 @@ const Avatar = styled.img`
   height: 42px;
   border-radius: 500px;
   border: 1px solid var(--border-colour);
+  box-sizing: border-box;
 `;
 
 const Wrapper = styled.header`
@@ -69,7 +82,7 @@ const Name = styled.input`
   color: var(--colour-font);
   font-family: var(--font-main);
   padding: 12px 14px;
-  width: 240px;
+  width: 420px;
   transition: 120ms;
   &:focus {
     border-color: var(--colour-primary);
@@ -110,13 +123,19 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
 
   return (
     <Wrapper>
-      <Link href='/'>
-        <Logo />
-      </Link>
+      <Spacer>
+        <Link href='/'>
+          <Logo />
+        </Link>
+      </Spacer>
       <Name value={name} onChange={_handleChange} />
-      <Spacer />
-      <ViewSelector active={view} onViewChange={_handleViewChange} />
-      {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
+      <Spacer>
+        <Spacer />
+        <ViewSelector active={view} onViewChange={_handleViewChange} />
+        <Button>Fork</Button>
+        <ButtonPrimary>Share</ButtonPrimary>
+        {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
+      </Spacer>
     </Wrapper>
   );
 };

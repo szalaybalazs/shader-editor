@@ -13,7 +13,6 @@ const Wrapper = styled.div`
 
 const Segment = styled.div<{ segmentWidth: number }>`
   height: 100vh;
-  width: calc(${(p) => p.segmentWidth * 100}% - 6px);
   display: flex;
   overflow: auto;
 `;
@@ -59,10 +58,12 @@ const Panes: FC<iPanesProps> = ({ left, right }) => {
       const { clientX } = e;
       const relativeWidth = (clientX - left) / width;
       const collapseSize = 200 / width;
-      setWidth(relativeWidth < collapseSize ? 0 : relativeWidth > 1 - collapseSize ? 1 : relativeWidth);
+      const value = relativeWidth < collapseSize ? 0 : relativeWidth > 1 - collapseSize ? 1 : relativeWidth;
+      setWidth(value);
     },
     [setWidth],
   );
+  console.log(width);
 
   const _handleMouseUp = () => {
     document.body.classList.remove('resizing-horizontal');
@@ -78,11 +79,15 @@ const Panes: FC<iPanesProps> = ({ left, right }) => {
 
   return (
     <Wrapper ref={wrapper}>
-      <Segment segmentWidth={width}>{width > 0 && left}</Segment>
+      <Segment style={{ width: `calc(${width * 100}% - 6px)` }} segmentWidth={width}>
+        {width > 0 && left}
+      </Segment>
       <Devider onMouseDown={_handleMouseDown}>
         <Handler />
       </Devider>
-      <Segment segmentWidth={1 - width}>{width < 1 && right}</Segment>
+      <Segment style={{ width: `calc(${(1 - width) * 100}% - 6px)` }} segmentWidth={1 - width}>
+        {width < 1 && right}
+      </Segment>
     </Wrapper>
   );
 };
