@@ -2,7 +2,11 @@
 import { MongoClient, MongoClientOptions } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
-const options: MongoClientOptions = {};
+const options: MongoClientOptions = {
+  maxIdleTimeMS: 270000,
+  minPoolSize: 2,
+  maxPoolSize: 4,
+};
 
 let client;
 export let clientPromise;
