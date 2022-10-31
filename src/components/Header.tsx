@@ -1,133 +1,103 @@
+import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { FC, useEffect, useMemo, useState } from 'react';
-import { flushSync } from 'react-dom';
+
+import { ChangeEvent, FC, useCallback } from 'react';
 import styled from 'styled-components';
 
-interface iHeaderProps {}
-
-const Placeholder = styled.div`
-  height: 120px;
+const Logo = styled.div`
+  height: 42px;
+  width: 42px;
+  background-color: var(--colour-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-secondary);
 `;
 
-const Wrapper = styled(Placeholder)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-
-  z-index: 1024;
-  pointer-events: none;
-`;
-
-const HeaderComponent = styled.header<{ isScrolled: boolean; isMounted: boolean }>`
-  pointer-events: all;
-  border-bottom: 1px solid var(--border-colour);
-  border-color: ${(p) => (p.isScrolled ? 'var(--border-colour)' : 'transparent')};
-  background: ${(p) => (p.isScrolled ? 'var(--background-primary-translucent)' : 'transparent')};
-  height: ${(p) => (p.isScrolled ? 64 : 120)}px;
-  display: flex;
-  align-items: center;
-  padding-inline: 16px;
-  font-size: 14px;
-  transition: ${(p) => (p.isMounted ? '320ms ease-in-out' : 'none')};
-
-  backdrop-filter: blur(6px);
-`;
-
-const Nav = styled.nav`
-  width: 100vw;
-  max-width: calc(var(--max-width) + 32px);
-  display: flex;
+const Login = styled.button`
+  background-color: var(--colour-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-secondary);
+  padding: 12px 24px;
+  font-family: var(--font-main);
+  font-weight: 500;
+  cursor: pointer;
+  color: white;
+  transition: 120ms;
+  &:hover {
+    filter: brightness(0.9);
+  }
+  &:active {
+    filter: brightness(0.8);
+  }
+  &:focus {
+    box-shadow: 0 0 0 4px var(--colour-primary-translucent);
+  }
 `;
 
 const Spacer = styled.div`
   flex: 1;
 `;
 
-const Header: FC<iHeaderProps> = () => {
-  const [isMounted, setIsMounted] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+const Avatar = styled.img`
+  width: 42px;
+  height: 42px;
+  border-radius: 500px;
+  border: 1px solid var(--border-colour);
+`;
 
-  useEffect(() => {
-    const _handleScroll = () => flushSync(() => setIsScrolled(window.scrollY > 50));
-    _handleScroll();
+const Wrapper = styled.header`
+  height: 64px;
+  border-bottom: 1px solid var(--border-colour);
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding-inline: 12px;
+  gap: 12px;
+  box-sizing: border-box;
+`;
 
-    setIsMounted(true);
-    window.addEventListener('scroll', _handleScroll);
-    return () => window.removeEventListener('scroll', _handleScroll);
-  }, []);
-  return (
-    <>
-      <Placeholder />
-      <Wrapper>
-        <HeaderComponent isScrolled={isScrolled} isMounted={isMounted}>
-          <Spacer />
-          <Nav>
-            <ActiveLink href='/' label='Home' />
-            <ActiveLink href='/articles' label='Articles' />
-            <ActiveLink href='https://twitter.com/szalayme' label='Twitter' />
-            <ActiveLink href='/about' label='About' />
-          </Nav>
-          <Spacer />
-        </HeaderComponent>
-      </Wrapper>
-    </>
-  );
-};
-
-interface iNavlinkProps {
-  readonly active: boolean;
-}
-const NavLink = styled.div<iNavlinkProps>`
-  line-height: 64px;
-  height: 100%;
-  opacity: ${(props) => (props.active ? 1 : 0.6)};
-  color: ${(props) => props.active && 'var(--colour-primary)'};
-  &:hover {
-    opacity: 1;
-    text-decoration: none;
-  }
-  a {
-    display: block;
-    line-height: 64px;
-    padding-inline: 16px;
-    text-decoration: none;
-    font-weight: 500;
-    color: inherit;
-    &:hover {
-      opacity: 1;
-      text-decoration: none;
-    }
+const Name = styled.input`
+  border-radius: 6px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-secondary);
+  height: 42px;
+  box-sizing: border-box;
+  color: var(--colour-font);
+  font-family: var(--font-main);
+  padding: 12px 14px;
+  width: 240px;
+  transition: 120ms;
+  &:focus {
+    border-color: var(--colour-primary);
+    box-shadow: 0 0 0 4px var(--colour-primary-translucent);
   }
 `;
 
-interface iActiveLink {
-  href: string;
-  label: string;
+interface iHeaderProps {
+  name: string;
+  onNameChange: (name: string) => void;
 }
-const ActiveLink: FC<iActiveLink> = ({ href, label }) => {
-  const { asPath } = useRouter();
 
-  const isActive = useMemo(() => {
-    if (href.startsWith('http')) return false;
+const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
+  const { data: session } = useSession();
+  const _handleChange = useCallback(
+    ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+      onNameChange(value);
+    },
+    [onNameChange],
+  );
 
-    if (href === '/') return asPath === href;
-    return asPath.startsWith(href);
-  }, [asPath, href]);
+  const _handleLogin = useCallback(() => signIn(), []);
 
   return (
-    <NavLink active={isActive}>
-      {href.startsWith('https') ? (
-        <a target='_blank' rel='noreferrer' href={href}>
-          {label}
-        </a>
-      ) : (
-        <Link href={href} passHref>
-          <a>{label}</a>
-        </Link>
-      )}
-    </NavLink>
+    <Wrapper>
+      <Link href='/'>
+        <Logo />
+      </Link>
+      <Name value={name} onChange={_handleChange} />
+      <Spacer />
+
+      {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
+    </Wrapper>
   );
 };
 
