@@ -20,9 +20,6 @@ const Segment = styled.div`
   flex: 1;
   display: flex;
   overflow: auto;
-  & > div {
-    overflow-y: auto !important ;
-  }
 `;
 
 const EditorPage: FC<iEditorProps> = ({ shader: code, id }) => {

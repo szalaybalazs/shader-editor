@@ -27,6 +27,19 @@
 
   --code-background: rgb(30, 30, 30);
   --code-border: rgb(46, 46, 46);
+
+  // Force using dark mode
+  --background-primary: rgb(23, 23, 23);
+  --background-primary-translucent: rgba(23, 23, 23, 0.9);
+  --background-secondary: rgb(30, 30, 30);
+
+  --border-colour: rgb(46, 46, 46);
+
+  --colour-primary: #3385ff;
+  // --colour-primary: #0066ff;
+  --colour-secondary: rgb(120, 127, 130);
+  --colour-font: rgb(225, 232, 240);
+  --colour-font-translucent: rgb(225, 232, 240, 0.8);
 }
 
 html,
