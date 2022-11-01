@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import puppeteer from 'puppeteer-core';
+// import puppeteer from 'puppeteer-core';
 import chrome from 'chrome-aws-lambda';
 
 const banner = async (req: NextApiRequest, res: NextApiResponse) => {
