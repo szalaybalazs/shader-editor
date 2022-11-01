@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer-core';
 import chrome from 'chrome-aws-lambda';
 
-const shaders = async (req: NextApiRequest, res: NextApiResponse) => {
+const banner = async (req: NextApiRequest, res: NextApiResponse) => {
   const { slug } = req.query;
 
   const browser = await puppeteer.launch({
@@ -31,4 +31,4 @@ const shaders = async (req: NextApiRequest, res: NextApiResponse) => {
   res.send(screenshot);
 };
 
-export default shaders;
+export default banner;
