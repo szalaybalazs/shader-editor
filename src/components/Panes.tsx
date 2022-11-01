@@ -62,7 +62,6 @@ const Panes: FC<iPanesProps> = ({ left, right }) => {
     },
     [setWidth],
   );
-  console.log(width);
 
   const _handleMouseUp = () => {
     document.body.classList.remove('resizing-horizontal');

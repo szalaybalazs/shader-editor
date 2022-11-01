@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { ChangeEvent, FC, useCallback, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilCallback, useRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { modalAtom } from '../atoms/modal';
 import { viewAtom } from '../atoms/view';
 import { eViewOption } from '../types/view';
 import ViewSelector from './ViewSelector';
@@ -90,6 +91,18 @@ const Name = styled.input`
   }
 `;
 
+const WIPWrapper = styled.div`
+  font-size: 1rem;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-weight: 500;
+  opacity: 0.6;
+`;
+
 interface iHeaderProps {
   name: string;
   onNameChange: (name: string) => void;
@@ -114,12 +127,30 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
 
   const _handleViewChange = (view: eViewOption) => {
     const { id } = router.query;
-    console.log(router);
     if (view === 'FULL') return router.push(`/${id}/full`);
     else setView(view);
   };
 
   const _handleLogin = useCallback(() => signIn(), []);
+
+  const _handleShare = useRecoilCallback(
+    ({ set }) =>
+      () => {
+        set(modalAtom, {
+          title: 'Share',
+          subtitle: 'Share your shader with your friends',
+          content: <WIPWrapper>I'm still working on this feature, please come back later 😉.</WIPWrapper>,
+        });
+      },
+    [],
+  );
+  const _handleFork = useRecoilCallback(
+    ({ set }) =>
+      () => {
+        set(modalAtom, { title: 'Fork', subtitle: 'Fork this shader', content: <></> });
+      },
+    [],
+  );
 
   return (
     <Wrapper>
@@ -132,8 +163,8 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
       <Spacer>
         <Spacer />
         <ViewSelector active={view} onViewChange={_handleViewChange} />
-        <Button>Fork</Button>
-        <ButtonPrimary>Share</ButtonPrimary>
+        <Button onClick={_handleFork}>Fork</Button>
+        <ButtonPrimary onClick={_handleShare}>Share</ButtonPrimary>
         {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
       </Spacer>
     </Wrapper>

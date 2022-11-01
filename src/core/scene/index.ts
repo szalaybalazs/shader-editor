@@ -132,7 +132,6 @@ export class Scene {
     this.previous = now;
 
     const { width, height } = gl.canvas.getBoundingClientRect();
-    console.log(width, height);
     gl.canvas.height = height * 2;
     gl.canvas.width = width * 2;
     // Setting uniforms

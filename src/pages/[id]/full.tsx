@@ -5,17 +5,17 @@ import Canvas from '../../components/Canvas';
 import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iFullProps {
-  shader: string;
+  code: string;
 }
 
 const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
 `;
-const Full: FC<iFullProps> = ({ shader }) => {
+const Full: FC<iFullProps> = ({ code }) => {
   return (
     <Wrapper>
-      <Canvas shader={shader} />
+      <Canvas shader={code} />
     </Wrapper>
   );
 };
