@@ -1,14 +1,17 @@
 import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
-import { FC } from 'react';
+import { useSession } from 'next-auth/react';
+import { FC, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { viewAtom } from '../../atoms/view';
 import Canvas from '../../components/Canvas';
+import DocumentHead from '../../components/document/Head';
 import Editor from '../../components/Editor';
 import Header from '../../components/Header';
 import Overlay from '../../components/Overlay';
 import Panes from '../../components/Panes';
+import progress from '../../core/progress';
 import { iShader } from '../../database/models/Shader';
 
 const Wrapper = styled.div`
@@ -21,42 +24,64 @@ import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iEditorProps extends iShader {}
 
-const EditorPage: FC<iEditorProps> = ({ code, id, name }) => {
+const EditorPage: FC<iEditorProps> = ({ code, id, name, user }) => {
+  const { data: session } = useSession();
+  const timeout = useRef<any>(null);
   const view = useRecoilValue(viewAtom);
   const formik = useFormik({
     initialValues: {
       name,
       code,
     },
-    onSubmit: () => {},
+    onSubmit: async ({ name, code }) => {
+      try {
+        progress.start();
+        await fetch('/api/shaders', {
+          method: 'POST',
+          body: JSON.stringify({ id, name, code }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+        console.log(code, name);
+      } catch (error) {
+      } finally {
+        progress.done();
+      }
+    },
   });
 
-  const _handleShaders = (shader: string) => formik.setFieldValue('code', shader);
-  const _handleNameChange = (name: string) => formik.setFieldValue('name', name);
+  const _handleSave = () => {
+    clearTimeout(timeout.current);
 
-  const _handleUpdate = (id: string, shader: string) => {
-    fetch('/api/shaders', {
-      method: 'POST',
-      body: JSON.stringify({ id, shader }),
-      headers: { 'Content-Type': 'application/json' },
-    });
+    timeout.current = setTimeout(() => formik.handleSubmit(), 500);
   };
 
-  const editor = <Editor value={formik.values.code} onChange={_handleShaders} />;
+  const _handleShaders = (shader: string) => {
+    formik.setFieldValue('code', shader);
+    _handleSave();
+  };
+  const _handleNameChange = (name: string) => {
+    formik.setFieldValue('name', name);
+    _handleSave();
+  };
+
+  const editor = <Editor value={formik.values.code || ''} onChange={_handleShaders} />;
   const canvas = <Canvas shader={formik.values.code} />;
 
   return (
-    <Wrapper>
-      <Header name={formik.values.name} onNameChange={_handleNameChange} />
-      {view === 'SPLIT' ? (
-        <Panes left={editor} right={canvas} />
-      ) : (
-        <>
-          {editor}
-          <Overlay>{canvas}</Overlay>
-        </>
-      )}
-    </Wrapper>
+    <>
+      <DocumentHead title={`${formik.values.name} by ${user?.name}`} />
+      <Wrapper>
+        <Header forkable={user.id !== session?.user?.id} name={formik.values.name} onNameChange={_handleNameChange} />
+        {view === 'SPLIT' ? (
+          <Panes left={editor} right={canvas} />
+        ) : (
+          <>
+            {editor}
+            <Overlay>{canvas}</Overlay>
+          </>
+        )}
+      </Wrapper>
+    </>
   );
 };
 

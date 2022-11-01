@@ -106,9 +106,10 @@ const WIPWrapper = styled.div`
 interface iHeaderProps {
   name: string;
   onNameChange: (name: string) => void;
+  forkable?: boolean;
 }
 
-const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
+const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable }) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [view, setView] = useRecoilState(viewAtom);
@@ -163,7 +164,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange }) => {
       <Spacer>
         <Spacer />
         <ViewSelector active={view} onViewChange={_handleViewChange} />
-        <Button onClick={_handleFork}>Fork</Button>
+        {forkable && <Button onClick={_handleFork}>Fork</Button>}
         <ButtonPrimary onClick={_handleShare}>Share</ButtonPrimary>
         {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
       </Spacer>

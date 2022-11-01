@@ -55,6 +55,7 @@ const ErrorOverlay = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding-inline: 16px;
 `;
 
 const ErrorTitle = styled.strong`

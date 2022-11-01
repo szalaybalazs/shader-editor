@@ -7,7 +7,7 @@ interface Props {
 }
 
 const absolutePath = (path?: string) => {
-  return `https://szalay.me${path || ''}`;
+  return `https://shader.szalay.me${path || ''}`;
 };
 
 const initialDescription =
@@ -15,7 +15,7 @@ const initialDescription =
 
 const DocumentHead: React.FC<Props> = ({ title, description }) => {
   const pageTitle = useMemo(() => {
-    return [title, 'szalay.me'].filter(Boolean).join(' | ');
+    return [title, 'shaders'].filter(Boolean).join(' | ');
   }, [title]);
   return (
     <Head>

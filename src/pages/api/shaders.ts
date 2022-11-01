@@ -20,17 +20,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json({ shader });
   } else if (req.method === 'POST') {
     try {
-      const { id, shader: code } = req.body;
+      const { id, code, name } = req.body;
 
       await dbConnect();
       const shader = await Shader.findOne({ _id: id });
+      if (!code) return res.status(400).json({ success: false });
       if (!shader) return res.status(404).json({ success: false });
       if (shader.userId && !(shader.userId as any).equals(session?.user?.id)) {
         return res.status(401).json({ success: false });
       }
 
       shader.code = code;
+      if (name) shader.name = name;
 
+      console.log(shader.code);
       await shader.save();
 
       return res.status(200).json({ success: true });

@@ -84,7 +84,7 @@ const Panes: FC<iPanesProps> = ({ left, right }) => {
         <Handler />
       </Devider>
       <Segment style={{ width: `calc(${(1 - width) * 100}% - 6px)` }} segmentWidth={1 - width}>
-        {width < 1 && right}
+        {width !== 1 && right}
       </Segment>
     </Wrapper>
   );

@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { nanoid } from 'nanoid';
+import { iUser, User } from './User';
 const randomWords = require('random-words');
 
+User;
 const defaultCode = `#version 300 es
 
 precision mediump float;
@@ -23,6 +25,8 @@ export interface iShader extends Document {
   createdAt: string;
   updatedAt: string;
   userId: string;
+
+  user?: iUser;
 }
 const schema: Schema = new mongoose.Schema(
   {
@@ -41,8 +45,8 @@ const schema: Schema = new mongoose.Schema(
       default: defaultCode,
     },
     userId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'users',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true },

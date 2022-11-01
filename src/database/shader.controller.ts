@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
 import { iShader, Shader } from './models/Shader';
-import { User } from './models/User';
 import dbConnect from './mongoose';
 
 export const getShaderBySlug = async (slug: string) => {
   await dbConnect();
-  return await Shader.findOne({ slug });
+  const shader = await Shader.findOne({ slug }).populate('userId');
+  if (!shader) return null;
+  return { ...shader?.toJSON(), user: (shader.userId as any)?.toJSON() };
 };
 
 export const getShadersForUser = async (id: string): Promise<iShader[]> => {
