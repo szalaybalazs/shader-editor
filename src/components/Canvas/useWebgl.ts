@@ -28,19 +28,22 @@ export const useWebGL = (shader: string) => {
     }
   }, []);
 
-  const updateShader = useCallback((shader: string) => {
-    if (!previousShader.current) {
-      previousShader.current = shader;
-      _handleUpdateShader(shader, true);
-    } else {
-      clearTimeout(timeout.current);
-      timeout.current = setTimeout(() => _handleUpdateShader(shader), 750);
-    }
-  }, []);
+  const updateShader = useCallback(
+    (shader: string) => {
+      if (!previousShader.current) {
+        previousShader.current = shader;
+        _handleUpdateShader(shader, true);
+      } else {
+        clearTimeout(timeout.current);
+        timeout.current = setTimeout(() => _handleUpdateShader(shader), 750);
+      }
+    },
+    [_handleUpdateShader],
+  );
 
   useEffect(() => {
     updateShader(shader);
-  }, [shader]);
+  }, [shader, updateShader]);
 
   return { canvas, fps, isUpdating, error, scene };
 };

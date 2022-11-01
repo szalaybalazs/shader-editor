@@ -117,7 +117,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable }) => {
   useEffect(() => {
     const view = localStorage.getItem('view');
     if (view) setView(view as eViewOption);
-  }, []);
+  }, [setView]);
 
   const _handleChange = useCallback(
     ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
@@ -140,7 +140,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable }) => {
         set(modalAtom, {
           title: 'Share',
           subtitle: 'Share your shader with your friends',
-          content: <WIPWrapper>I'm still working on this feature, please come back later 😉.</WIPWrapper>,
+          content: <WIPWrapper>I&apos;m still working on this feature, please come back later 😉.</WIPWrapper>,
         });
       },
     [],

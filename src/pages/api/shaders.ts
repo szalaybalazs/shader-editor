@@ -5,9 +5,8 @@ import { Shader } from '../../database/models/Shader';
 import dbConnect from '../../database/mongoose';
 import { createShader } from '../../database/shader.controller';
 import { authOptions } from './auth/[...nextauth]';
-import { Schema } from 'mongoose';
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const shaders = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await unstable_getServerSession(req, res, authOptions);
 
   if (req.method === 'PUT') {
@@ -43,3 +42,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } else return res.status(400);
 };
+
+export default shaders;

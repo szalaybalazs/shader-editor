@@ -37,7 +37,7 @@ const highlight = (code: string) => (
 const Editor: FC<iEditorProps> = ({ value, onChange }) => {
   const id = useId();
   useEffect(() => {
-    const _handleKeyDown = (e) => {
+    const _handleKeyDown = (e: KeyboardEvent) => {
       const { key, metaKey } = e;
       if (metaKey && key === 'i') {
         onChange(format(value, { parser: 'glsl-parser', plugins: [glslparser], printWidth: 120 }));
@@ -47,7 +47,8 @@ const Editor: FC<iEditorProps> = ({ value, onChange }) => {
 
     window.addEventListener('keydown', _handleKeyDown);
     return () => window.removeEventListener('keydown', _handleKeyDown);
-  }, []);
+  }, [onChange, value]);
+
   return (
     <Wrapper>
       <CodeEditor
