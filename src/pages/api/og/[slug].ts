@@ -13,14 +13,17 @@ const banner = async (req: NextApiRequest, res: NextApiResponse) => {
     //   defaultViewport: { width: 1024, height: 1024 },
     // });
 
+    // /tmp/chromium [class Chromium]
+
     const browser = await puppeteer.launch(
       process.env.NODE_ENV === 'production'
         ? {
             args: chrome.args,
             executablePath: await chrome.executablePath,
             headless: chrome.headless,
+            defaultViewport: { width: 1024, height: 1024 },
           }
-        : {},
+        : { defaultViewport: { width: 1024, height: 1024 } },
     );
 
     const page = await browser.newPage();
