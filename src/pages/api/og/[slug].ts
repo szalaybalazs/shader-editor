@@ -5,12 +5,23 @@ import chrome from 'chrome-aws-lambda';
 const banner = async (req: NextApiRequest, res: NextApiResponse) => {
   const { slug } = req.query;
 
-  const browser = await puppeteer.launch({
-    defaultViewport: { width: 1024, height: 1024 },
-    args: chrome.args,
-    executablePath: await chrome.executablePath,
-    headless: chrome.headless,
-  });
+  console.log(await chrome.executablePath, chrome);
+  // const browser = await puppeteer.launch({
+  //   args: chrome.args,
+  //   executablePath: await chrome.executablePath,
+  //   headless: chrome.headless,
+  //   defaultViewport: { width: 1024, height: 1024 },
+  // });
+
+  const browser = await puppeteer.launch(
+    process.env.NODE_ENV === 'production'
+      ? {
+          args: chrome.args,
+          executablePath: await chrome.executablePath,
+          headless: chrome.headless,
+        }
+      : {},
+  );
 
   const page = await browser.newPage();
 
