@@ -131,6 +131,10 @@ export class Scene {
     this.handleFps(delta);
     this.previous = now;
 
+    const { width, height } = gl.canvas.getBoundingClientRect();
+    console.log(width, height);
+    gl.canvas.height = height * 2;
+    gl.canvas.width = width * 2;
     // Setting uniforms
     gl.uniform1f(programInfo.uniformLocations.time, time / 1000);
     gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);

@@ -12,7 +12,6 @@ const Wrapper = styled.div`
 `;
 
 const Segment = styled.div<{ segmentWidth: number }>`
-  height: 100vh;
   display: flex;
   overflow: auto;
 `;
