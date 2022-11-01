@@ -70,7 +70,7 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
   return (
     <>
       <DocumentHead
-        image={`https://shader-editor.vercel.app/${slug}/full?clear=true&banner=true`}
+        image={`https://shader-editor.vercel.app/api/og/${slug}`}
         title={`${formik.values.name} by ${user?.name}`}
       />
       <Wrapper>
