@@ -4,6 +4,7 @@ import Head from 'next/head';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
 }
 
 const absolutePath = (path?: string) => {
@@ -13,7 +14,7 @@ const absolutePath = (path?: string) => {
 const initialDescription =
   'Software engineer with too much time on his hand, with absolutely no work-life balance issues.';
 
-const DocumentHead: React.FC<Props> = ({ title, description }) => {
+const DocumentHead: React.FC<Props> = ({ title, description, image }) => {
   const pageTitle = useMemo(() => {
     return [title, 'shaders'].filter(Boolean).join(' | ');
   }, [title]);
@@ -24,7 +25,7 @@ const DocumentHead: React.FC<Props> = ({ title, description }) => {
       <meta name='viewport' content='width=device-width, initial-scale=0.65, maximum-scale=5.0, minimum-scale=0.65' />
       <meta property='og:url' content={absolutePath()} />
       <meta property='og:description' content={description || initialDescription} />
-      <meta property='og:image' content={absolutePath('/og-image.png')} />
+      <meta property='og:image' content={image || absolutePath('/og-image.png')} />
       <meta property='twitter:card' content='summary' />
       <meta property='twitter:description' content={description || initialDescription} />
       <meta property='twitter:site' content='@szalayme' />

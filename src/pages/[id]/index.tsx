@@ -24,7 +24,7 @@ import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iEditorProps extends iShader {}
 
-const EditorPage: FC<iEditorProps> = ({ code, id, name, user }) => {
+const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
   const { data: session } = useSession();
   const timeout = useRef<any>(null);
   const view = useRecoilValue(viewAtom);
@@ -69,7 +69,10 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, user }) => {
 
   return (
     <>
-      <DocumentHead title={`${formik.values.name} by ${user?.name}`} />
+      <DocumentHead
+        image={`https://shader-editor.vercel.app/${slug}/full?clear=true&banner=true`}
+        title={`${formik.values.name} by ${user?.name}`}
+      />
       <Wrapper>
         <Header forkable={user.id !== session?.user?.id} name={formik.values.name} onNameChange={_handleNameChange} />
         {view === 'SPLIT' ? (
