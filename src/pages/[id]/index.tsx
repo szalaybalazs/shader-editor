@@ -2,8 +2,9 @@ import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import { useSession } from 'next-auth/react';
 import { FC, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilCallback, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
+import { modalAtom } from '../../atoms/modal';
 import { viewAtom } from '../../atoms/view';
 import Canvas from '../../components/Canvas';
 import DocumentHead from '../../components/document/Head';
@@ -11,7 +12,9 @@ import Editor from '../../components/Editor';
 import Header from '../../components/Header';
 import Overlay from '../../components/Overlay';
 import Panes from '../../components/Panes';
+import Share from '../../components/Share';
 import progress from '../../core/progress';
+import { record } from '../../core/record';
 import { iShader } from '../../database/models/Shader';
 
 const Wrapper = styled.div`
@@ -64,6 +67,17 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
     _handleSave();
   };
 
+  const _handleShare = useRecoilCallback(
+    ({ set }) =>
+      () => {
+        set(modalAtom, {
+          title: 'Share',
+          subtitle: 'Share your shader with your friends',
+          content: <Share code={formik.values.code} />,
+        });
+      },
+    [formik.values.code],
+  );
   const editor = <Editor value={formik.values.code || ''} onChange={_handleShaders} />;
   const canvas = <Canvas shader={formik.values.code} />;
 
@@ -74,7 +88,12 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
         title={`${formik.values.name} by ${user?.name}`}
       />
       <Wrapper>
-        <Header forkable={user.id !== session?.user?.id} name={formik.values.name} onNameChange={_handleNameChange} />
+        <Header
+          onShare={_handleShare}
+          forkable={user.id !== session?.user?.id}
+          name={formik.values.name}
+          onNameChange={_handleNameChange}
+        />
         {view === 'SPLIT' ? (
           <Panes left={editor} right={canvas} />
         ) : (

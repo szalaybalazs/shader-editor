@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDimensions } from './useDimensions';
 import { useWebGL } from './useWebgl';
@@ -79,6 +79,11 @@ const Svg = styled.svg`
 const Canvas: FC<iCanvasProps> = ({ shader }) => {
   const { canvas, fps, error } = useWebGL(shader);
   const { wrapper } = useDimensions();
+
+  useEffect(() => {
+    // @ts-ignore
+    window.__CANVAS = canvas.current;
+  }, [canvas]);
 
   return (
     <Wrapper ref={wrapper} className='canvas-wrapper'>

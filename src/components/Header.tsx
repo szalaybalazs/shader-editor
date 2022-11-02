@@ -107,9 +107,10 @@ interface iHeaderProps {
   name: string;
   onNameChange: (name: string) => void;
   forkable?: boolean;
+  onShare?: () => void;
 }
 
-const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable }) => {
+const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable, onShare }) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [view, setView] = useRecoilState(viewAtom);
@@ -134,17 +135,6 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable }) => {
 
   const _handleLogin = useCallback(() => signIn(), []);
 
-  const _handleShare = useRecoilCallback(
-    ({ set }) =>
-      () => {
-        set(modalAtom, {
-          title: 'Share',
-          subtitle: 'Share your shader with your friends',
-          content: <WIPWrapper>I&apos;m still working on this feature, please come back later 😉.</WIPWrapper>,
-        });
-      },
-    [],
-  );
   const _handleFork = useRecoilCallback(
     ({ set }) =>
       () => {
@@ -165,7 +155,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable }) => {
         <Spacer />
         <ViewSelector active={view} onViewChange={_handleViewChange} />
         {forkable && <Button onClick={_handleFork}>Fork</Button>}
-        <ButtonPrimary onClick={_handleShare}>Share</ButtonPrimary>
+        {onShare && <ButtonPrimary onClick={onShare}>Share</ButtonPrimary>}
         {session?.user ? <Avatar src={session.user?.image} /> : <Login onClick={_handleLogin}>Login</Login>}
       </Spacer>
     </Wrapper>
