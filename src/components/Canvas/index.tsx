@@ -1,11 +1,12 @@
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
+import { tBuffer } from '../../database/models/Shader';
 import { useDimensions } from './useDimensions';
 import { useWebGL } from './useWebgl';
 
 interface iCanvasProps {
   shader: string;
-  textureUris?: string[];
+  buffers?: tBuffer[];
 }
 
 const Wrapper = styled.div`
@@ -76,7 +77,7 @@ const Svg = styled.svg`
   color: var(--colour-red);
 `;
 
-const Canvas: FC<iCanvasProps> = ({ shader }) => {
+const Canvas: FC<iCanvasProps> = ({ shader, buffers }) => {
   const { canvas, fps, error, scene } = useWebGL(shader);
   const { wrapper } = useDimensions();
 
@@ -84,6 +85,10 @@ const Canvas: FC<iCanvasProps> = ({ shader }) => {
     // @ts-ignore
     window.__CANVAS = canvas.current;
   }, [canvas]);
+
+  useEffect(() => {
+    scene.current.setBuffers(buffers);
+  }, [buffers]);
 
   const _handleMouseMove = ({ pageX, pageY }) => {
     const { left, top, width, height } = wrapper.current.getBoundingClientRect();

@@ -36,7 +36,7 @@ const Button = styled.button`
     filter: brightness(0.8);
   }
   &:focus {
-    box-shadow: 0 0 0 4px var(--border-colour);
+    box-shadow: 0 0 0 4px var(--colour-border);
   }
 `;
 
@@ -59,13 +59,13 @@ const Avatar = styled.img`
   width: 42px;
   height: 42px;
   border-radius: 500px;
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   box-sizing: border-box;
 `;
 
 const Wrapper = styled.header`
   height: 64px;
-  border-bottom: 1px solid var(--border-colour);
+  border-bottom: 1px solid var(--colour-border);
   width: 100vw;
   display: flex;
   align-items: center;
@@ -108,9 +108,10 @@ interface iHeaderProps {
   onNameChange: (name: string) => void;
   forkable?: boolean;
   onShare?: () => void;
+  onBuffersOpen?: () => void;
 }
 
-const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable, onShare }) => {
+const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable, onShare, onBuffersOpen }) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [view, setView] = useRecoilState(viewAtom);
@@ -153,6 +154,7 @@ const Header: FC<iHeaderProps> = ({ name, onNameChange, forkable, onShare }) => 
       <Name value={name} onChange={_handleChange} />
       <Spacer>
         <Spacer />
+        {onBuffersOpen && <Button onClick={onBuffersOpen}>Textures</Button>}
         <ViewSelector active={view} onViewChange={_handleViewChange} />
         {forkable && <Button onClick={_handleFork}>Fork</Button>}
         {onShare && <ButtonPrimary onClick={onShare}>Share</ButtonPrimary>}

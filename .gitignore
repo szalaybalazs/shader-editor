@@ -10,6 +10,8 @@
 
 # next.js
 /.next/
+.env
+.env.prod
 /out/
 
 # production

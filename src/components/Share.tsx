@@ -130,7 +130,7 @@ const ImageWrapper = styled.div`
   aspect-ratio: 1;
   display: block;
   position: relative;
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   border-radius: 8px;
   overflow: hidden;
 `;
@@ -160,7 +160,7 @@ const Label = styled.label`
 
 const Input = styled.input`
   display: block;
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   margin-top: 6px;
   width: 100%;
   height: 36px;

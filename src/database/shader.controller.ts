@@ -9,14 +9,6 @@ export const getShaderBySlug = async (slug: string) => {
 };
 
 export const getShadersForUser = async (id: string): Promise<iShader[]> => {
-  // return query(
-  //   `
-  //     SELECT shaders.* FROM \`users\`
-  //     RIGHT JOIN shaders ON user_id = users.id
-  //     WHERE users.email = ?
-  //   `,
-  //   [user],
-  // );
   await dbConnect();
   return Shader.find({ userId: id });
 };

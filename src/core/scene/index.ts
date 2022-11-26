@@ -2,6 +2,7 @@ import { iProgramInfo } from './program';
 import { Buffer } from './buffers';
 import { ProgramInfo } from './program';
 import { Texture } from './texture';
+import { tBuffer } from '../../database/models/Shader';
 
 interface iVec2 {
   x: number;
@@ -28,10 +29,6 @@ export class Scene {
     if (this.gl) {
       this.buffers = new Buffer(this.gl);
       this.program = new ProgramInfo(this.gl);
-
-      this.textures.push(new Texture(this.gl, 'https://images.pexels.com/photos/3408744/pexels-photo-3408744.jpeg'));
-
-      this.textures.map((texture) => texture.init());
     }
   }
 
@@ -42,6 +39,25 @@ export class Scene {
   static createScene = (canvas?: HTMLCanvasElement | null) => {
     if (!canvas) return null;
     return new Scene(canvas);
+  };
+
+  /**
+   * Set buffesr for scene
+   * @param buffers
+   */
+  setBuffers = (buffers: tBuffer[]) => {
+    const orderedBuffers = buffers.sort((a, b) => a.index - b.index);
+
+    console.log('Setting buffers');
+
+    orderedBuffers.forEach((buffer) => {
+      if (buffer.type === 'TEXTURE') {
+        const src = `${process.env.NEXT_PUBLIC_STATIC_ENDPOINT}${buffer.key}`;
+        this.textures.push(new Texture(this.gl, src));
+      }
+
+      this.textures.map((texture) => texture.init());
+    });
   };
 
   /**

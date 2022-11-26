@@ -30,7 +30,7 @@ const Tab = styled.button<{ active: boolean }>`
 `;
 
 const Background = styled.div`
-  background-color: var(--border-colour);
+  background-color: var(--colour-border);
   position: absolute;
   transition: 320ms ease-in-out;
   border-radius: 6px;

@@ -24,7 +24,7 @@ const Wrapper = styled.div<{ visible: boolean }>`
   width: 640px;
   min-height: 560px;
   background-color: var(--background-primary);
-  border: 1px solid var(--border-colour);
+  /* border: 1px solid var(--colour-border); */
   z-index: 2;
   position: relative;
   border-radius: 12px;

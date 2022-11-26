@@ -50,22 +50,24 @@ const Editor: FC<iEditorProps> = ({ value, onChange }) => {
   }, [onChange, value]);
 
   return (
-    <Wrapper>
-      <CodeEditor
-        textareaId={id}
-        value={value}
-        onValueChange={onChange}
-        highlight={highlight}
-        padding={16}
-        style={{
-          fontFamily: '"Fira code", "Fira Mono", monospace',
-          fontSize: 12,
-          height: 'fit-content',
-          width: 'fit-content',
-          whiteSpace: 'nowrap',
-        }}
-      />
-    </Wrapper>
+    <>
+      <Wrapper>
+        <CodeEditor
+          textareaId={id}
+          value={value}
+          onValueChange={onChange}
+          highlight={highlight}
+          padding={16}
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+            height: 'fit-content',
+            width: 'fit-content',
+            whiteSpace: 'nowrap',
+          }}
+        />
+      </Wrapper>
+    </>
   );
 };
 

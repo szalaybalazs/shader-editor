@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   width: 420px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
 `;
 
 interface iOverlayProps {

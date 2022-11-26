@@ -40,7 +40,7 @@ const Background = styled.div<{ offsetLeft: number }>`
   height: 36px;
   width: 36px;
   transform: translateX(${(p) => p.offsetLeft}px);
-  background-color: var(--border-colour);
+  background-color: var(--colour-border);
   position: absolute;
   border-radius: 4px;
   transition: 160ms ease-in-out;

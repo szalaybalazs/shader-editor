@@ -2,7 +2,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 
 const FooterComponent = styled.footer`
-  border-top: 1px solid var(--border-colour);
+  border-top: 1px solid var(--colour-border);
   margin-top: 64px;
 `;
 

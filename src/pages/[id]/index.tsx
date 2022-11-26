@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import { useSession } from 'next-auth/react';
-import { FC, useRef } from 'react';
+import { FC, useCallback, useRef } from 'react';
 import { useRecoilCallback, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { modalAtom } from '../../atoms/modal';
@@ -10,6 +10,7 @@ import Canvas from '../../components/Canvas';
 import DocumentHead from '../../components/document/Head';
 import Editor from '../../components/Editor';
 import Header from '../../components/Header';
+import { useModal } from '../../components/Modal/modal.hook';
 import Overlay from '../../components/Overlay';
 import Panes from '../../components/Panes';
 import Share from '../../components/Share';
@@ -27,7 +28,8 @@ import { getShaderBySlug } from '../../database/shader.controller';
 
 interface iEditorProps extends iShader {}
 
-const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
+const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user, buffers }) => {
+  const { open } = useModal();
   const { data: session } = useSession();
   const timeout = useRef<any>(null);
   const view = useRecoilValue(viewAtom);
@@ -35,6 +37,7 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
     initialValues: {
       name,
       code,
+      buffers,
     },
     onSubmit: async ({ name, code }) => {
       try {
@@ -66,19 +69,14 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
     _handleSave();
   };
 
-  const _handleShare = useRecoilCallback(
-    ({ set }) =>
-      () => {
-        set(modalAtom, {
-          title: 'Share',
-          subtitle: 'Share your shader with your friends',
-          content: <Share code={formik.values.code} />,
-        });
-      },
-    [formik.values.code],
-  );
+  const _handleShare = useCallback(() => {
+    open('Share', 'Share your shader with your friends', <Share code={formik.values.code} />);
+  }, [formik.values.code]);
+  const _handleBuffers = useCallback(() => {
+    open('Buffers', 'Edit the buffers your shader uses', <></>);
+  }, [formik.values.code]);
   const editor = <Editor value={formik.values.code || ''} onChange={_handleShaders} />;
-  const canvas = <Canvas shader={formik.values.code} />;
+  const canvas = <Canvas shader={formik.values.code} buffers={formik.values.buffers} />;
 
   return (
     <>
@@ -88,6 +86,7 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
       />
       <Wrapper>
         <Header
+          onBuffersOpen={_handleBuffers}
           onShare={_handleShare}
           forkable={user.id !== session?.user?.id}
           name={formik.values.name}
