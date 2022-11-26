@@ -8,8 +8,8 @@ const s3 = new AWS.S3({
   // accessKeyId: accessKey,
   // secretAccessKey: secretKey,
   signatureVersion: 'v4',
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
+  accessKeyId: process.env.SHADER_AWS_ACCESS_KEY,
+  secretAccessKey: process.env.SHADER_AWS_SECRET_KEY,
 });
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction

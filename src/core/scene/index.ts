@@ -48,8 +48,6 @@ export class Scene {
   setBuffers = (buffers?: tBuffer[]) => {
     const orderedBuffers = buffers?.sort((a, b) => a.index - b.index) || [];
 
-    console.log('Setting buffers', buffers);
-
     this.textures = orderedBuffers.map((buffer) => {
       if (buffer.type === 'TEXTURE') {
         const src = `${process.env.NEXT_PUBLIC_STATIC_ENDPOINT}${buffer.key}`;
@@ -58,8 +56,6 @@ export class Scene {
 
       return new Texture(this.gl, '/favicon.ico');
     });
-
-    console.log(this.textures);
 
     this.textures.map((texture) => texture.init());
   };

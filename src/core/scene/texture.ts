@@ -114,7 +114,6 @@ export class Texture {
 
     // Tell the shader we bound the texture to texture unit #i
     const textureKey: string = `u_texture_${unit}`;
-    console.log(this.src, unit, textureKey);
     const position = programInfo.textureLocations[textureKey];
     gl.uniform1i(position, unit);
   };

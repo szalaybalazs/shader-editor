@@ -78,7 +78,7 @@ const Svg = styled.svg`
 `;
 
 const Canvas: FC<iCanvasProps> = ({ shader, buffers }) => {
-  const { canvas, fps, error, scene } = useWebGL(shader);
+  const { canvas, fps, errors, scene } = useWebGL(shader);
   const { wrapper } = useDimensions();
 
   useEffect(() => {
@@ -96,13 +96,13 @@ const Canvas: FC<iCanvasProps> = ({ shader, buffers }) => {
     const x = (pageX - left) / width;
     const y = (pageY - top) / height;
 
-    scene.current.setMousePosition({ x, y });
+    scene.current.setMousePosition({ x, y: Math.abs(1 - y) });
   };
 
   return (
     <Wrapper onMouseMove={_handleMouseMove} ref={wrapper} className='canvas-wrapper'>
       <Content>
-        {error && (
+        {!!errors.length && (
           <ErrorOverlay>
             <Svg
               width='24'
@@ -119,7 +119,13 @@ const Canvas: FC<iCanvasProps> = ({ shader, buffers }) => {
               <line x1='12' y1='16' x2='12.01' y2='16'></line>
             </Svg>
             <ErrorTitle>Failed to compile shader</ErrorTitle>
-            <ErrorContent>{error}</ErrorContent>
+            <ErrorContent>
+              {errors.map((error, index) => (
+                <div key={index.toString()}>
+                  {error.line}:{error.column} '{error.word}': {error.message}
+                </div>
+              ))}
+            </ErrorContent>
           </ErrorOverlay>
         )}
         <FPS>FPS: {fps.toFixed(0)}</FPS>

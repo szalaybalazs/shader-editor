@@ -98,7 +98,6 @@ const Buffers: FunctionComponent<iBuffersProps> = ({ buffers: initialBuffers, se
   const _handleRemove = (index: number) => () => {
     const _buffers = [...buffers];
     _buffers.splice(index, 1);
-    console.log(_buffers);
     setBuffers(_buffers);
   };
 
