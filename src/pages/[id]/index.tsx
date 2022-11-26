@@ -44,7 +44,6 @@ const EditorPage: FC<iEditorProps> = ({ code, id, name, slug, user }) => {
           body: JSON.stringify({ id, name, code }),
           headers: { 'Content-Type': 'application/json' },
         });
-        console.log(code, name);
       } catch (error) {
       } finally {
         progress.done();

@@ -1,6 +1,5 @@
 export const record = async (canvas: HTMLCanvasElement, time: number): Promise<string> => {
-  var recordedChunks = [];
-  return new Promise(function (res) {
+  return new Promise((res, rej) => {
     var stream = canvas.captureStream(60 /*fps*/);
 
     // const mediaRecorder = new MediaRecorder(stream, {
@@ -27,16 +26,17 @@ export const record = async (canvas: HTMLCanvasElement, time: number): Promise<s
     const recordedChunks = [];
 
     console.log(stream);
-    const options = { mimeType: 'video/webm; codecs=vp9' };
-    const mediaRecorder = new MediaRecorder(stream, options);
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'video/webm',
+      audioBitsPerSecond: 0,
+      videoBitsPerSecond: 8000000,
+    });
 
     setTimeout(() => mediaRecorder.stop(), time || 1000);
 
-    mediaRecorder.ondataavailable = handleDataAvailable;
     mediaRecorder.start();
 
-    function handleDataAvailable(event: any) {
-      console.log('data-available');
+    mediaRecorder.addEventListener('dataavailable', (event) => {
       if (event.data.size > 0) {
         recordedChunks.push(event.data);
         console.log(recordedChunks);
@@ -47,8 +47,8 @@ export const record = async (canvas: HTMLCanvasElement, time: number): Promise<s
 
         res(url);
       } else {
-        res('EMPTY');
+        rej('EMPTY');
       }
-    }
+    });
   });
 };

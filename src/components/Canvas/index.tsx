@@ -77,7 +77,7 @@ const Svg = styled.svg`
 `;
 
 const Canvas: FC<iCanvasProps> = ({ shader }) => {
-  const { canvas, fps, error } = useWebGL(shader);
+  const { canvas, fps, error, scene } = useWebGL(shader);
   const { wrapper } = useDimensions();
 
   useEffect(() => {
@@ -85,8 +85,17 @@ const Canvas: FC<iCanvasProps> = ({ shader }) => {
     window.__CANVAS = canvas.current;
   }, [canvas]);
 
+  const _handleMouseMove = ({ pageX, pageY }) => {
+    const { left, top, width, height } = wrapper.current.getBoundingClientRect();
+
+    const x = (pageX - left) / width;
+    const y = (pageY - top) / height;
+
+    scene.current.setMousePosition({ x, y });
+  };
+
   return (
-    <Wrapper ref={wrapper} className='canvas-wrapper'>
+    <Wrapper onMouseMove={_handleMouseMove} ref={wrapper} className='canvas-wrapper'>
       <Content>
         {error && (
           <ErrorOverlay>

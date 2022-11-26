@@ -1,6 +1,7 @@
 import { iProgramInfo } from './program';
 import { Buffer } from './buffers';
 import { ProgramInfo } from './program';
+import { Texture } from './texture';
 
 interface iVec2 {
   x: number;
@@ -16,15 +17,21 @@ export class Scene {
   previous: number = 0;
   lastFpsInvocation: number = 0;
 
+  textures: Texture[] = [];
+
   mouse: iVec2 = { x: 0, y: 0 };
 
   private onFpsChange: (fps: number) => void = () => {};
 
   constructor(canvas: HTMLCanvasElement) {
-    this.gl = canvas.getContext('webgl2');
+    this.gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true });
     if (this.gl) {
       this.buffers = new Buffer(this.gl);
       this.program = new ProgramInfo(this.gl);
+
+      this.textures.push(new Texture(this.gl, 'https://images.pexels.com/photos/3408744/pexels-photo-3408744.jpeg'));
+
+      this.textures.map((texture) => texture.init());
     }
   }
 
@@ -80,8 +87,8 @@ export class Scene {
   /**
    * Drawing to canvas
    */
-  public draw = () => {
-    requestAnimationFrame(this.draw);
+  public draw = (options: { keepFrame?: boolean; timestamp?: number; dimensions?: [number, number] } = {}) => {
+    if (!options?.keepFrame) requestAnimationFrame(() => this.draw(options));
 
     const gl = this.gl;
     if (!gl) return console.log('SCENE:DRAW - WebGL context is not initialized');
@@ -95,8 +102,9 @@ export class Scene {
     this.buffers?.bind(programInfo);
 
     // Set textures
+    this.textures.map((t, index) => t.bind(programInfo, index));
 
-    this.setUniforms(programInfo);
+    this.setUniforms(programInfo, options.timestamp, options.dimensions);
     this.buffers?.draw();
   };
 
@@ -120,20 +128,25 @@ export class Scene {
   /**
    * Set uniforms of scene
    */
-  public setUniforms = (programInfo: iProgramInfo) => {
+  public setUniforms = (programInfo: iProgramInfo, timestamp?: number, dimensions?: [number, number]) => {
     const gl = this.gl;
     if (!gl) throw new Error('SCENE::SET_UNIFORMS - WebGL context is not initialized');
 
     const now = Date.now();
     if (!this.start) this.start = now;
-    const time = now - this.start;
+    const time = timestamp ?? now - this.start;
     const delta = now - this.previous;
     this.handleFps(delta);
     this.previous = now;
 
-    const { width, height } = gl.canvas.getBoundingClientRect();
-    gl.canvas.height = height * 2;
-    gl.canvas.width = width * 2;
+    if (!dimensions) {
+      const { width, height } = gl.canvas.getBoundingClientRect();
+      gl.canvas.height = height * 2;
+      gl.canvas.width = width * 2;
+    } else {
+      gl.canvas.width = dimensions[0];
+      gl.canvas.height = dimensions[1];
+    }
     // Setting uniforms
     gl.uniform1f(programInfo.uniformLocations.time, time / 1000);
     gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);

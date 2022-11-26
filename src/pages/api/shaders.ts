@@ -31,8 +31,6 @@ const shaders = async (req: NextApiRequest, res: NextApiResponse) => {
 
       shader.code = code;
       if (name) shader.name = name;
-
-      console.log(shader.code);
       await shader.save();
 
       return res.status(200).json({ success: true });

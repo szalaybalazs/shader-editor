@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ffmpeg/core": "^0.11.0",
+    "@ffmpeg/ffmpeg": "^0.11.6",
     "@next-auth/mongodb-adapter": "^1.1.1",
+    "canvas-capture": "^2.0.5",
     "chrome-aws-lambda": "^7.0.0",
     "formik": "^2.2.9",
     "mongodb": "^4.11.0",

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Scene } from '../../core/scene';
 
-export const useWebGL = (shader: string) => {
+export const useWebGL = (shader: string, options: { animated?: boolean; timestamp?: number } = { animated: true }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const scene = useRef<Scene | null>(null);
   const timeout = useRef<any>(null);
@@ -14,8 +14,8 @@ export const useWebGL = (shader: string) => {
     scene.current = Scene.createScene(canvas.current);
     scene.current?.init();
     scene.current?.setOnFpsUpdate(setFps);
-    scene.current?.draw();
-  }, []);
+    if (options.animated) scene.current?.draw();
+  }, [options.animated]);
 
   const _handleUpdateShader = useCallback((shader: string, preventUpdate?: boolean) => {
     setIsUpdating(!preventUpdate && true);

@@ -22,7 +22,7 @@ const Backdrop = styled.div`
 `;
 const Wrapper = styled.div<{ visible: boolean }>`
   width: 640px;
-  height: 560px;
+  min-height: 560px;
   background-color: var(--background-primary);
   border: 1px solid var(--border-colour);
   z-index: 2;

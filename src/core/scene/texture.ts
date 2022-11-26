@@ -105,6 +105,7 @@ export class Texture {
     const gl = this.gl;
     if (!gl) throw new Error('TEXTURE::BIND - WebGL context is not initialized');
 
+    console.log('binding');
     // Bind textures
     // Tell WebGL we want to affect texture unit 0
     gl.activeTexture(this.textureKeys[unit]);
