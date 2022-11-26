@@ -9,7 +9,7 @@ interface iVec2 {
   y: number;
 }
 export class Scene {
-  gl: WebGLRenderingContext | null = null;
+  gl: WebGL2RenderingContext | null = null;
 
   buffers: Buffer | null = null;
   program: ProgramInfo | null = null;
@@ -45,19 +45,23 @@ export class Scene {
    * Set buffesr for scene
    * @param buffers
    */
-  setBuffers = (buffers: tBuffer[]) => {
-    const orderedBuffers = buffers.sort((a, b) => a.index - b.index);
+  setBuffers = (buffers?: tBuffer[]) => {
+    const orderedBuffers = buffers?.sort((a, b) => a.index - b.index) || [];
 
-    console.log('Setting buffers');
+    console.log('Setting buffers', buffers);
 
-    orderedBuffers.forEach((buffer) => {
+    this.textures = orderedBuffers.map((buffer) => {
       if (buffer.type === 'TEXTURE') {
         const src = `${process.env.NEXT_PUBLIC_STATIC_ENDPOINT}${buffer.key}`;
-        this.textures.push(new Texture(this.gl, src));
+        return new Texture(this.gl, src);
       }
 
-      this.textures.map((texture) => texture.init());
+      return new Texture(this.gl, '/favicon.ico');
     });
+
+    console.log(this.textures);
+
+    this.textures.map((texture) => texture.init());
   };
 
   /**

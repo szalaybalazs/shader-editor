@@ -76,6 +76,8 @@ const CloseWrapper = styled.button`
 const Content = styled.div`
   flex: 1;
   padding-inline: 24px;
+  display: flex;
+  flex-direction: column;
 `;
 
 interface iModalProps {}

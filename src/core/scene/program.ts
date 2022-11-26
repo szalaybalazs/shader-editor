@@ -17,7 +17,7 @@ export interface iProgramInfo {
 }
 
 export class ProgramInfo {
-  gl: WebGLRenderingContext | null = null;
+  gl: WebGL2RenderingContext | null = null;
   shader: string = `#version 300 es
 
   precision mediump float;
@@ -34,7 +34,7 @@ export class ProgramInfo {
 
   shaderProgram: WebGLProgram | null = null;
 
-  constructor(gl: WebGLRenderingContext) {
+  constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
   }
 
@@ -52,6 +52,8 @@ export class ProgramInfo {
   public init = () => {
     const gl = this.gl;
     if (!gl) throw new Error('PROGRAM::GETPROGRAMINFO - WebGL context is not initialized');
+
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
     this.shaderProgram = initShaderProgram(gl, vertex_shader, this.shader);
   };

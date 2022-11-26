@@ -18,13 +18,21 @@ void main()
     fragColor = vec4(vec3(sin(u_time) / 2.0 + 1.0, cos(u_time) / 2.0 + 1.0, 1.0), 1.0);
 }`;
 
-export type tBuffer =
-  | {
-      key: string;
-      index: number;
-      type: 'TEXTURE';
-    }
-  | { index: number; type: 'PREVIOUS_FRAGMANT' };
+export interface iBaseBuffer {
+  id: string;
+  index: number;
+}
+export interface iTextureBuffer extends iBaseBuffer {
+  key: string;
+  filename: string;
+  type: 'TEXTURE';
+}
+
+export interface iFragmentBuffer extends iBaseBuffer {
+  type: 'PREVIOUS_FRAGMENT';
+}
+
+export type tBuffer = iTextureBuffer | iFragmentBuffer;
 
 export interface iShader extends Document {
   slug: string;
@@ -46,14 +54,11 @@ const schema: Schema = new mongoose.Schema(
     name: {
       type: String,
     },
-    // shader: {
-    //   type: String,
-    //   default: defaultCode,
-    // },
     buffers: [
       new mongoose.Schema({
         key: String,
         index: Number,
+        filename: String,
         type: { type: String, enum: ['TEXTURE', 'PREVIOUS_FRAGMENT'] },
       }),
     ],

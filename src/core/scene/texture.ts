@@ -5,7 +5,7 @@ const isPowerOf2 = (value: number): boolean => {
 };
 
 export class Texture {
-  gl: WebGLRenderingContext | null = null;
+  gl: WebGL2RenderingContext | null = null;
   texture: WebGLTexture | null = null;
 
   private level = 0;
@@ -21,7 +21,7 @@ export class Texture {
 
   private src: string = '';
 
-  constructor(gl: WebGLRenderingContext, src: string) {
+  constructor(gl: WebGL2RenderingContext, src: string) {
     this.gl = gl;
     this.src = src;
   }
@@ -114,6 +114,7 @@ export class Texture {
 
     // Tell the shader we bound the texture to texture unit #i
     const textureKey: string = `u_texture_${unit}`;
+    console.log(this.src, unit, textureKey);
     const position = programInfo.textureLocations[textureKey];
     gl.uniform1i(position, unit);
   };

@@ -7,8 +7,8 @@ export interface iBuffers {
 export class Buffer {
   private positions: WebGLBuffer | null = null;
 
-  gl: WebGLRenderingContext | null = null;
-  constructor(gl: WebGLRenderingContext) {
+  gl: WebGL2RenderingContext | null = null;
+  constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
   }
 

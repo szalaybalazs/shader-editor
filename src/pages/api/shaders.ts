@@ -19,7 +19,7 @@ const shaders = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json({ shader });
   } else if (req.method === 'POST') {
     try {
-      const { id, code, name } = req.body;
+      const { id, code, name, buffers } = req.body;
 
       await dbConnect();
       const shader = await Shader.findOne({ _id: id });
@@ -31,6 +31,10 @@ const shaders = async (req: NextApiRequest, res: NextApiResponse) => {
 
       shader.code = code;
       if (name) shader.name = name;
+      if (buffers) {
+        shader.buffers = buffers;
+        shader.markModified('buffers');
+      }
       await shader.save();
 
       return res.status(200).json({ success: true });

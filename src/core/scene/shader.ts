@@ -1,4 +1,4 @@
-export const loadShader = (gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null => {
+export const loadShader = (gl: WebGL2RenderingContext, type: number, source: string): WebGLShader | null => {
   const shader = gl.createShader(type);
   if (!shader) return null;
 
@@ -26,7 +26,7 @@ export const loadShader = (gl: WebGLRenderingContext, type: number, source: stri
  * @param fsSource
  * @returns
  */
-export const initShaderProgram = (gl: WebGLRenderingContext, vsSource: string, fsSource: string) => {
+export const initShaderProgram = (gl: WebGL2RenderingContext, vsSource: string, fsSource: string) => {
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
   const shaderProgram = gl.createProgram();

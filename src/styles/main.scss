@@ -12,6 +12,7 @@
   --colour-border: rgb(237, 239, 245);
 
   --colour-primary: #0066ff;
+  --colour-primary-5: #{transparentize(#0066ff, .95)};
   // --colour-secondary: #b8c8e0;
   --colour-secondary: #bdc2db;
   --colour-secondary: #a6bad9;
@@ -26,6 +27,9 @@
     'Open Sans', 'Helvetica Neue', sans-serif;
 
   --colour-red: #e9190f;
+  --colour-red-hover: #{transparentize(#e9190f, .9)};
+  --colour-red-active: #{transparentize(#e9190f, .8)};
+  --colour-red-focus: #{transparentize(#e9190f, .95)};
 
   --code-background: rgb(30, 30, 30);
   --code-border: rgb(46, 46, 46);

@@ -66,6 +66,7 @@ const Tabs: FC<iTabsProps> = ({ tabs, active, onChange }) => {
     <Wrapper ref={wrapper} onMouseLeave={() => setHighlighted(active)}>
       {tabs.map((tab) => (
         <Tab
+          key={tab.value}
           onClick={() => onChange(tab.value)}
           onMouseEnter={() => setHighlighted(tab.value)}
           ref={(ref) => (refs.current[tab.value] = ref)}
