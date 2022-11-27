@@ -1,6 +1,6 @@
-import { functionKeys, functions } from './functions';
+import { functionKeys, preventDuplicateFunctions } from './functions';
 
-export const keywords = [
+export const regularKeywords = preventDuplicateFunctions([
   'const',
   'uniform',
   'break',
@@ -139,4 +139,4 @@ export const keywords = [
   'uint',
   'void',
   'bool',
-].filter((k) => !functionKeys.includes(k));
+]);

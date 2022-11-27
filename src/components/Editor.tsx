@@ -94,7 +94,7 @@ const Editor: FC<iEditorProps> = ({ value, onChange }) => {
       <Wrapper ref={wrapper}>
         <CodeEditor
           beforeMount={_handleEditorWillMount}
-          options={{ minimap: { enabled: false }, fontFamily: 'Fira Code' }}
+          options={{ minimap: { enabled: false }, fontFamily: 'Fira Code', fontLigatures: true }}
           language='glsl'
           value={value}
           onChange={onChange}

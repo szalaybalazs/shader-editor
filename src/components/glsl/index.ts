@@ -1,112 +1,14 @@
 import { Monaco } from '@monaco-editor/react';
-import { types } from './types';
-import { keywords } from './keywords';
-import { languages } from 'monaco-editor';
-import { functionKeys, functions, preventDuplicateFunctions } from './functions';
-
-const directives = preventDuplicateFunctions([
-  '#',
-  '#define',
-  '#undef',
-  '#if',
-  '#ifdef',
-  '#ifndef',
-  '#else',
-  '#elif',
-  '#endif',
-  '#error',
-  '#pragma',
-  '#extension',
-  '#version',
-  '#line',
-]);
-
-const storage = preventDuplicateFunctions([
-  'in',
-  'out',
-  'uniform',
-  'layout',
-  'attribute',
-  'varying',
-  'precision',
-  'highp',
-  'mediump',
-  'lowp',
-]);
-
-const operators = [
-  '*',
-  '+',
-  '-',
-  '/',
-  '~',
-  '!',
-  '%',
-  '<<',
-  '>>',
-  '<',
-  '>',
-  '<=',
-  '>=',
-  '==',
-  '!=',
-  '&',
-  '^',
-  '|',
-  '&&',
-  '^^',
-  '||',
-  // selection ?:
-  '=',
-  '+=',
-  '-=',
-  '*=',
-  '/=',
-  '%=',
-  '<<=',
-  '>>=',
-  '&=',
-  '^=',
-  '|=',
-];
-
-const builtin_vars = preventDuplicateFunctions([
-  // language variables
-  'gl_VertexID',
-  'gl_InstanceID', // non-vulkan
-  'gl_VertexIndex',
-  'gl_InstanceIndex', // vulkan
-  'gl_DrawID',
-  'gl_BaseVertex',
-  'gl_BaseInstance',
-  'gl_Position',
-  'gl_PointSize',
-  'gl_ClipDistance',
-  'gl_CullDistance', // perVertex
-
-  // compatibility profile
-  'gl_Color',
-  'gl_SecondaryColor',
-  'gl_Normal',
-  'gl_Vertex',
-  'gl_MultiTexCoord0',
-  'gl_MultiTexCoord1',
-  'gl_MultiTexCoord2',
-  'gl_MultiTexCoord3',
-  'gl_MultiTexCoord4',
-  'gl_MultiTexCoord5',
-  'gl_MultiTexCoord6',
-  'gl_MultiTexCoord7',
-  'gl_FogCoord',
-]);
-
-const constants = preventDuplicateFunctions([
-  'gl_MaxVertexAttribs',
-  'gl_MaxVertexUniformVectors',
-  'gl_MaxVertexUniformComponents',
-  'gl_MaxVertexOutputComponents',
-  // TODO: add more constants from the 7.3 section of GLSLangSpec.4.60.pdf
-]);
+import { IRange, languages } from 'monaco-editor';
+import { builtinKeywords } from './keywords/builtin';
+import { constantKeywords } from './keywords/constants';
+import { directiveKeywords } from './keywords/directives';
+import { functions } from './keywords/functions';
+import { regularKeywords } from './keywords/keywords';
+import { operatorKeywords } from './keywords/operators';
+import { storageKeywords } from './keywords/storage';
+import { typeKeywords } from './keywords/types';
+import { tokenizer } from './tokenizer';
 
 export const createLanguage = (monaco: Monaco) => {
   const languages = monaco.languages;
@@ -148,128 +50,80 @@ export const createLanguage = (monaco: Monaco) => {
     tokenPostfix: '.glsl',
     defaultToken: 'invalid',
 
-    keywords,
+    keywords: regularKeywords,
+
     // preprocessor directives
-    directives,
+    directives: directiveKeywords,
     // preprocessor macros
     macros: ['__LINE__', '__FILE__', '__VERSION__'],
 
     // storage modifiers
-    storage,
-
-    types,
-
-    operators,
-
-    builtin_vars,
-
-    constants,
+    storage: storageKeywords,
+    types: typeKeywords,
+    operators: operatorKeywords,
+    builtin_vars: builtinKeywords,
+    constants: constantKeywords,
 
     intsuffix: '[uU]?',
     floatsuffix: '([fF]|(fl|FL))?',
 
-    tokenizer: {
-      root: [
-        [/\/\/.*$/, 'comment.line'],
-        [/\/\*/, 'comment.block', '@comment'],
-
-        [
-          /#[a-z]*/,
-          {
-            cases: {
-              '@directives': 'keyword.control.preprocessor',
-              '@default': 'invalid',
-            },
-          },
-        ],
-
-        ['GL_ES', 'meta.preprocessor'],
-        [
-          /__[A-Z_]+__/,
-          {
-            cases: {
-              '@macros': 'meta.preprocessor',
-              '@default': 'invalid',
-            },
-          },
-        ],
-
-        [/[{}()\[\]]/, '@brackets'],
-
-        [/(true|false)/, 'constant'],
-
-        [
-          /[\=\+\-\*\/\>\<\&\|\%\!\^]+/,
-          {
-            cases: {
-              '@operators': 'operator',
-              '@default': 'invalid',
-            },
-          },
-        ],
-
-        [/[a-zA-Z][a-zA-Z0-9_]*(?=\()/, 'entity.name.function'],
-
-        [
-          /[a-zA-Z][a-zA-Z0-9_]*/,
-          {
-            cases: {
-              '@storage': 'storage.type',
-              '@types': 'entity.name.type',
-              '@builtin_vars': 'keyword',
-              '@default': 'variable.name',
-            },
-          },
-        ],
-
-        [/\d*\d+[eE]([\-+]?\d+)?(@floatsuffix)/, 'number.float'],
-        [/\d*\.\d+([eE][\-+]?\d+)?(@floatsuffix)/, 'number.float'],
-
-        [/0[xX][0-9a-fA-F](@intsuffix)/, 'number.hex'],
-        [/0[0-7](@intsuffix)/, 'number.octal'],
-        [/\d+(@intsuffix)/, 'number'],
-
-        [/[;,.]/, 'delimiter'],
-      ],
-
-      comment: [
-        ['\\*/', 'comment.block', '@pop'],
-        ['.*', 'comment.block'],
-      ],
-    },
+    tokenizer,
   });
 
-  const generateSuggestions = (arr: string[], type: languages.CompletionItemKind) => {
+  const generateSuggestions = (arr: string[], type: languages.CompletionItemKind, range: IRange) => {
     return arr.map((k) => ({
       label: k,
       kind: type,
       insertText: k,
-      range: undefined as any,
+      range,
     }));
   };
 
   monaco.languages.registerCompletionItemProvider(langId, {
     provideCompletionItems(model, position, context, token) {
+      const word = model.getWordUntilPosition(position);
+
+      // const code = model.getValue();
+
+      // const ast = parser.parse(code);
+      // const vars = parse(code);
+      // console.log(vars);
+      // const variables = ast.scopes
+      //   .map((scope) => {
+      //     const vars = Object.keys(scope.bindings);
+      //     return vars.map((key) => ({
+      //       name: key,
+      //       type: (scope as any).bindings[key].initializer?.initializer?.identifier, //.initializer.initializer.identifier.specifier.token,
+      //     }));
+      //   })
+      //   .flat();
+
+      // console.log(ast);
+      // console.log(variables);
+      const range: IRange = {
+        startLineNumber: position.lineNumber,
+        endLineNumber: position.lineNumber,
+        startColumn: word.startColumn,
+        endColumn: word.endColumn,
+      };
       const suggestions = [
-        generateSuggestions(keywords, monaco.languages.CompletionItemKind.Keyword),
-        generateSuggestions(operators, monaco.languages.CompletionItemKind.Operator),
-        generateSuggestions(types, monaco.languages.CompletionItemKind.TypeParameter),
-        generateSuggestions(constants, monaco.languages.CompletionItemKind.Constant),
-        generateSuggestions(storage, monaco.languages.CompletionItemKind.Struct),
-        generateSuggestions(builtin_vars, monaco.languages.CompletionItemKind.Constant),
-        generateSuggestions(directives, monaco.languages.CompletionItemKind.Keyword),
+        generateSuggestions(regularKeywords, monaco.languages.CompletionItemKind.Keyword, range),
+        generateSuggestions(operatorKeywords, monaco.languages.CompletionItemKind.Operator, range),
+        generateSuggestions(typeKeywords, monaco.languages.CompletionItemKind.TypeParameter, range),
+        generateSuggestions(constantKeywords, monaco.languages.CompletionItemKind.Constant, range),
+        generateSuggestions(storageKeywords, monaco.languages.CompletionItemKind.Struct, range),
+        generateSuggestions(builtinKeywords, monaco.languages.CompletionItemKind.Constant, range),
+        generateSuggestions(directiveKeywords, monaco.languages.CompletionItemKind.Keyword, range),
         Object.entries(functions).map(([key, value]) => {
           return {
             label: {
               label: key,
               detail: ` ${value.name}`,
-              // description: ` ${value.name}`,
-              documentation: value.descriptionMD,
             },
             kind: monaco.languages.CompletionItemKind.Function,
             insertText: key,
-            range: undefined,
-            documentation: value.descriptionMD,
+            range,
+            documentation: { value: `# ${key}\n${value.descriptionMD}`, isTrusted: true },
           };
         }),
       ];
@@ -279,7 +133,7 @@ export const createLanguage = (monaco: Monaco) => {
   });
 
   monaco.languages.registerSignatureHelpProvider(langId, {
-    signatureHelpTriggerCharacters: ['('],
+    // signatureHelpTriggerCharacters: ['('],
     provideSignatureHelp(model, position, token, context) {
       const textUntilPosition = model.getValueInRange({
         startLineNumber: position.lineNumber,
@@ -310,6 +164,25 @@ export const createLanguage = (monaco: Monaco) => {
           activeParameter: 0,
         },
         dispose: () => {},
+      };
+    },
+  });
+
+  monaco.languages.registerHoverProvider(langId, {
+    provideHover(model, position, token) {
+      const word = model.getWordAtPosition(position);
+      const range: IRange = {
+        startLineNumber: position.lineNumber,
+        endLineNumber: position.lineNumber,
+        startColumn: word.startColumn,
+        endColumn: word.endColumn,
+      };
+
+      const func = functions[word.word];
+
+      return {
+        range,
+        contents: func ? [{ value: func.descriptionMD, isTrusted: true }] : [],
       };
     },
   });

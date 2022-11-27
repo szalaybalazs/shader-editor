@@ -187,7 +187,7 @@ const ImageShare: FC<iImageShare> = ({ code }) => {
   const [dimensions, setDimensions] = useState(1024);
   const [timestamp, setTimestamp] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const { canvas, fps, scene, error } = useWebGL(code, { animated: false });
+  const { canvas, scene } = useWebGL(code, { animated: false });
 
   const target = useRef<HTMLCanvasElement>();
   const timeout = useRef<any>();

@@ -1,4 +1,6 @@
-export const types = [
+import { preventDuplicateFunctions } from './functions';
+
+export const typeKeywords = preventDuplicateFunctions([
   'void',
   'bool',
   'int',
@@ -165,4 +167,4 @@ export const types = [
 
   'sampler',
   'samplerShadow',
-];
+]);

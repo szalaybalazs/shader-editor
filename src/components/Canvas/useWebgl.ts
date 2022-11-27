@@ -46,8 +46,7 @@ export const useWebGL = (shader: string, options: { animated?: boolean; timestam
         .filter((l) => l !== '[SHADER_ERROR]')
         .filter((l) => l.trim().startsWith('ERROR:'));
 
-      console.log(errors);
-      const markers = errors.map((error) => {
+      const markers = errors.map((error: string) => {
         const [_, _line, _field, message] = error.replace('ERROR: ', '').trim().split(':');
         const word = _field.trim().replace(/(^')|('$)/g, '');
 
@@ -62,7 +61,7 @@ export const useWebGL = (shader: string, options: { animated?: boolean; timestam
             : originalLine.length - originalLine.trimStart().length + 1; // todo: find first non-space character
         const length = splits.length < 3 ? word.length : originalLine.length; // todo: find first non-space character
 
-        console.log({ lineContent, originalLine, line, message, word, column });
+        // console.log({ lineContent, originalLine, line, message, word, column });
 
         return {
           line,

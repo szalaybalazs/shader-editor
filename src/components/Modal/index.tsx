@@ -1,7 +1,8 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { modalAtom } from '../../atoms/modal';
+import { createPortal } from 'react-dom';
 
 const Container = styled.div<{ visible: boolean }>`
   position: fixed;
@@ -90,7 +91,9 @@ const Modal: FC<iModalProps> = () => {
   const _handleClose = () => setModal(null);
 
   useEffect(() => {
-    if (modalState) setPresentedModal(modalState);
+    if (modalState) {
+      setPresentedModal(modalState);
+    }
   }, [modalState]);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ const Modal: FC<iModalProps> = () => {
     return () => window.removeEventListener('keydown', _handleKey);
   }, [setModal]);
 
-  const visible = !!modalState;
+  const visible = useMemo(() => !!modalState, [!modalState]);
 
   return (
     <Container visible={visible}>
