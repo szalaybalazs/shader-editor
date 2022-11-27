@@ -122,7 +122,7 @@ const Canvas: FC<iCanvasProps> = ({ shader, buffers }) => {
             <ErrorContent>
               {errors.map((error, index) => (
                 <div key={index.toString()}>
-                  {error.line}:{error.column} '{error.word}': {error.message}
+                  {error.line}:{error.column} &apos;{error.word}&apos;: {error.message}
                 </div>
               ))}
             </ErrorContent>

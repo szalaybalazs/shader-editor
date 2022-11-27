@@ -12,6 +12,48 @@ import { tokenizer } from './tokenizer';
 import { format } from 'prettier';
 import * as glslparser from 'prettier-plugin-glsl';
 
+// todo: figure out a better swizzle logic
+const swizzle = {
+  2: ['0', '1', '01', '10', '00', '11'],
+  3: [
+    '0',
+    '1',
+    '2',
+    '00',
+    '01',
+    '02',
+    '10',
+    '11',
+    '12',
+    '20',
+    '21',
+    '22',
+    '000',
+    '001',
+    '010',
+    '100',
+    '101',
+    '111',
+    '000',
+    '002',
+    '020',
+    '200',
+    '202',
+    '222',
+    '222',
+    '221',
+    '212',
+    '122',
+    '121',
+    '111',
+    '111',
+    '112',
+    '121',
+    '211',
+    '212',
+    '222',
+  ],
+};
 const formatShader = (code: string) => {
   return format(code, { parser: 'glsl-parser', plugins: [glslparser], printWidth: 120 });
 };
@@ -99,6 +141,26 @@ export const createLanguage = (monaco: Monaco) => {
   monaco.languages.registerCompletionItemProvider(langId, {
     provideCompletionItems(model, position, context, token) {
       const word = model.getWordUntilPosition(position);
+      const code = model.getValueInRange({
+        startColumn: 0,
+        startLineNumber: 0,
+        endColumn: position.column,
+        endLineNumber: position.lineNumber,
+      });
+
+      const regexp = new RegExp(`(${typeKeywords.map((t) => `${t}\\s+`).join('|')})(.+);`, 'gm');
+
+      // @ts-ignore
+      const matches = [...code.matchAll(regexp)];
+
+      const variables = matches
+        .map((match) => {
+          const type = match[1];
+          const def = match[2].replace(/\(.+\)/gm, '');
+          const defs = def.split(',').map((d) => d.split('=')[0].trim());
+          return defs.map((name) => ({ name, type }));
+        })
+        .flat();
 
       // const code = model.getValue();
 
@@ -117,13 +179,27 @@ export const createLanguage = (monaco: Monaco) => {
 
       // console.log(ast);
       // console.log(variables);
+
+      const variable = variables.find((v) => v.name === word.word);
       const range: IRange = {
         startLineNumber: position.lineNumber,
         endLineNumber: position.lineNumber,
         startColumn: word.startColumn,
         endColumn: word.endColumn,
       };
+
       const suggestions = [
+        variables.map(({ type, name }): languages.CompletionItem => {
+          return {
+            label: {
+              label: name,
+              description: ` ${type}`,
+            },
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: name,
+            range,
+          };
+        }),
         generateSuggestions(regularKeywords, monaco.languages.CompletionItemKind.Keyword, range),
         generateSuggestions(operatorKeywords, monaco.languages.CompletionItemKind.Operator, range),
         generateSuggestions(typeKeywords, monaco.languages.CompletionItemKind.TypeParameter, range),
@@ -131,11 +207,11 @@ export const createLanguage = (monaco: Monaco) => {
         generateSuggestions(storageKeywords, monaco.languages.CompletionItemKind.Struct, range),
         generateSuggestions(builtinKeywords, monaco.languages.CompletionItemKind.Constant, range),
         generateSuggestions(directiveKeywords, monaco.languages.CompletionItemKind.Keyword, range),
-        Object.entries(functions).map(([key, value]) => {
+        Object.entries(functions).map(([key, value]): languages.CompletionItem => {
           return {
             label: {
               label: key,
-              detail: ` ${value.declaration}`,
+              description: ` ${value.declaration}`,
             },
             kind: monaco.languages.CompletionItemKind.Function,
             insertText: key,
@@ -146,6 +222,71 @@ export const createLanguage = (monaco: Monaco) => {
       ];
 
       return { suggestions: suggestions.flat() };
+    },
+  });
+
+  monaco.languages.registerCompletionItemProvider(langId, {
+    triggerCharacters: ['.'],
+    provideCompletionItems(model, position, token, context) {
+      const word = model.getWordUntilPosition(position);
+      const code = model.getValueInRange({
+        startColumn: 0,
+        startLineNumber: 0,
+        endColumn: position.column,
+        endLineNumber: position.lineNumber,
+      });
+
+      const regexp = new RegExp(`(${typeKeywords.map((t) => `${t}\\s+`).join('|')})(.+);`, 'gm');
+
+      // @ts-ignore
+      const matches = [...code.matchAll(regexp)];
+
+      const variables = matches
+        .map((match) => {
+          const type = match[1];
+          const def = match[2].replace(/\(.+\)/gm, '');
+          const defs = def.split(',').map((d) => d.split('=')[0].trim());
+          return defs.map((name) => ({ name, type }));
+        })
+        .flat();
+      const lastIdentifier = code.trim().replace(/.$/, '').split(/ |\n/).reverse()[0];
+
+      const variable = variables.find((v) => v.name === lastIdentifier);
+      const range: IRange = {
+        startLineNumber: position.lineNumber,
+        endLineNumber: position.lineNumber,
+        startColumn: word.startColumn,
+        endColumn: word.endColumn,
+      };
+
+      // todo: better field handling
+
+      const suggestions = [];
+      console.log(variable);
+      if (variable?.type?.startsWith('vec')) {
+        const keys = ['xyzw', 'rgba', 'stpq'];
+        const num = Number(variable.type.replace('vec', ''));
+        const defs = Array.from(new Set(swizzle[num]));
+        if (defs) {
+          defs.forEach((def: string) => {
+            const indices = def.split('');
+            keys.forEach((key) => {
+              const newKey = indices.map((index) => key[index]).join('');
+              suggestions.push({
+                label: {
+                  label: newKey,
+                  description: ` ${newKey}`,
+                },
+                kind: monaco.languages.CompletionItemKind.Value,
+                insertText: newKey,
+                range,
+              });
+            });
+          });
+        }
+      }
+
+      return { suggestions };
     },
   });
 
