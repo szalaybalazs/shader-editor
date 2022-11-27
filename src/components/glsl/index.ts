@@ -9,7 +9,12 @@ import { operatorKeywords } from './keywords/operators';
 import { storageKeywords } from './keywords/storage';
 import { typeKeywords } from './keywords/types';
 import { tokenizer } from './tokenizer';
+import { format } from 'prettier';
+import * as glslparser from 'prettier-plugin-glsl';
 
+const formatShader = (code: string) => {
+  return format(code, { parser: 'glsl-parser', plugins: [glslparser], printWidth: 120 });
+};
 export const createLanguage = (monaco: Monaco) => {
   const languages = monaco.languages;
 
@@ -44,6 +49,18 @@ export const createLanguage = (monaco: Monaco) => {
       { open: '"', close: '"' },
       { open: "'", close: "'" },
     ],
+  });
+
+  monaco.languages.registerDocumentFormattingEditProvider(langId, {
+    provideDocumentFormattingEdits(model, options) {
+      var formatted = formatShader(model.getValue());
+      return [
+        {
+          range: model.getFullModelRange(),
+          text: formatted,
+        },
+      ];
+    },
   });
 
   languages.setMonarchTokensProvider(langId, {
@@ -118,7 +135,7 @@ export const createLanguage = (monaco: Monaco) => {
           return {
             label: {
               label: key,
-              detail: ` ${value.name}`,
+              detail: ` ${value.declaration}`,
             },
             kind: monaco.languages.CompletionItemKind.Function,
             insertText: key,
@@ -180,9 +197,15 @@ export const createLanguage = (monaco: Monaco) => {
 
       const func = functions[word.word];
 
+      if (!func) return { range, contents: [] };
+
       return {
         range,
-        contents: func ? [{ value: func.descriptionMD, isTrusted: true }] : [],
+        contents: [
+          // { value: `**${word.word}**`, isTrusted: true },
+          { value: '```glsl\n' + func.declaration + '\n```', isTrusted: true, supportHtml: true },
+          { value: func.descriptionMD, isTrusted: true },
+        ],
       };
     },
   });

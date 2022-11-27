@@ -48,9 +48,18 @@ export const useWebGL = (shader: string, options: { animated?: boolean; timestam
 
       const markers = errors.map((error: string) => {
         const [_, _line, _field, message] = error.replace('ERROR: ', '').trim().split(':');
+        if (error.includes('Missing main()')) {
+          return {
+            line: 1,
+            column: 1,
+            message: 'Mising main()',
+            length: 500,
+            word: 'main()',
+          };
+        }
         const word = _field.trim().replace(/(^')|('$)/g, '');
 
-        const lineContent = lines[_line - 1].trim();
+        const lineContent = lines[Number(_line) - 1].trim();
         const originalLine = originalLines.find((l) => l.trim() === lineContent);
         const line = originalLines.indexOf(originalLine) + 1;
 

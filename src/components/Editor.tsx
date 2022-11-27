@@ -11,7 +11,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { errorAtom, monacoAtom } from '../atoms/shader';
 import { createLanguage } from './glsl';
-import { createTheme } from './theme';
+import { createTheme } from './glsl/theme';
 // import * as monaco from 'monaco-editor';
 
 const Wrapper = styled.div`
@@ -62,10 +62,52 @@ const Editor: FC<iEditorProps> = ({ value, onChange }) => {
     // here is the monaco instance
     // do something before editor is mounted
     // monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+    const languages = monaco.languages.getLanguages();
+    if (languages.find((l) => l.id === 'glsl')) return;
     createLanguage(monaco);
     createTheme(monaco);
     setMonaco(monaco);
+
+    // monaco.editor.addCommand({
+    //   // An unique identifier of the contributed action.
+    //   id: 'format',
+
+    //   // A label of the action that will be presented to the user.
+    //   // label: 'My Label!!!',
+
+    //   // An optional array of keybindings for the action.
+    //   keybindings: [
+    //     monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10,
+    //     // chord
+    //     monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM),
+    //   ],
+
+    //   // A precondition for this action.
+    //   precondition: null,
+
+    //   // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
+    //   keybindingContext: null,
+
+    //   contextMenuGroupId: 'navigation',
+
+    //   contextMenuOrder: 1.5,
+
+    //   // Method that will be executed when the action is triggered.
+    //   // @param editor The editor instance is passed in as a convenience
+    //   run: function (ed) {
+    //     alert("i'm running => " + ed.getPosition());
+    //   },
+    // });
+    // monaco.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, () => {
+    // monaco.languages.getLanguages()[0].getAction("editor.action.formatDocument")
+    // });
     // monaco.languages.set
+  };
+
+  const _handleEditorDidMount = (monacoeditor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+    monacoeditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      monacoeditor.getAction('editor.action.formatDocument').run();
+    });
   };
 
   useEffect(() => {
@@ -94,7 +136,14 @@ const Editor: FC<iEditorProps> = ({ value, onChange }) => {
       <Wrapper ref={wrapper}>
         <CodeEditor
           beforeMount={_handleEditorWillMount}
-          options={{ minimap: { enabled: false }, fontFamily: 'Fira Code', fontLigatures: true }}
+          onMount={_handleEditorDidMount}
+          options={{
+            minimap: { enabled: false },
+            fontFamily: 'Fira Code',
+            fontLigatures: true,
+            // fontSize: 12,
+            // fontWeight: '500'
+          }}
           language='glsl'
           value={value}
           onChange={onChange}

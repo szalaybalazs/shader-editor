@@ -65,7 +65,7 @@ export const tokenizer: { [key: string]: languages.IMonarchLanguageRule[] } = {
   ],
 
   comment: [
-    ['\\*/', 'comment.block', '@pop'],
+    ['(.+)?\\*/', 'comment.block', '@pop'],
     ['.*', 'comment.block'],
   ],
 };
